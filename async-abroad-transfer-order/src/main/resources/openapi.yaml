@@ -1,0 +1,391 @@
+---
+openapi: 3.0.0
+info:
+  title: API Support Banking Order Search V1
+  description: |
+    Support API for Order Search <br>
+    > <b>Dominio de Servicio BIAN</b> `Position Keeping`<br>
+  version: 1.0.3
+externalDocs:
+  description: API Documentation
+  url: https://example.com/api-docs
+servers:
+  - url: http://localhost:8080/support/banking/v1
+    description: Development
+tags:
+  - name: Order
+    description: Order Controller
+paths:
+  /orders-search/orders:
+    post:
+      tags:
+        - Order
+      summary: Creates a new order in the search database
+      description: |
+        ### Details:
+        Creates a new order in the search database, this database contains only the required attributes used in the search/consult module, and allow fast retrieve operations.
+      operationId: PostOrder
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: true
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: true
+          schema:
+            $ref: '#/components/schemas/request-date'
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: true
+          schema:
+            $ref: '#/components/schemas/request-id'
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Hash or identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostOrder'
+      responses:
+        "200":
+          description: Successful creation.
+        "400":
+          description: The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    PostOrder:
+      allOf:
+        - $ref: '#/components/schemas/Order'
+    Order:
+      type: object
+      required:
+        - orderId
+      properties:
+        id:
+          type: number
+          description: hashed order id
+          example: 28956
+        orderId:
+          type: number
+          description: hashed order id
+          example: asdf-213-dsdewwww-56666
+        customerUserId:
+          type: string
+          description: Order id used in tray
+          example: "14559"
+        orderType:
+          type: string
+          description: Order id used in tray
+          example: "14559"
+        action:
+          type: string
+          description: Order id used in tray
+          example: "14559"
+        status:
+          type: string
+          description: Order id used in tray
+          example: "14559"
+    Error:
+      required:
+        - developerMessage
+        - errorCode
+        - userMessage
+      type: object
+      properties:
+        errorCode:
+          maxLength: 6
+          pattern: ^[a-zA-Z]+$\d+$
+          type: string
+          example: "6"
+        developerMessage:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: Coding Error
+        userMessage:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: Error al validar dispositvo
+        moreInfo:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: ""
+        version:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: 1.0.0
+        status:
+          maxLength: 15
+          type: number
+          example: 409
+    request-date:
+      type: string
+    request-id:
+      type: string
+    ErrorModel:
+      required:
+        - developerMessage
+        - errorCode
+        - userMessage
+      type: object
+      properties:
+        errorCode:
+          maxLength: 6
+          pattern: ^[a-zA-Z]+$\d+$
+          type: string
+          example: "6"
+        developerMessage:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: Coding Error
+        userMessage:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: Error al validar dispositvo
+        moreInfo:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: ""
+        version:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: 1.0.0
+        status:
+          maxLength: 15
+          type: number
+          example: 409
+    PostOrderRetrieveRequest_pagination:
+      type: object
+      properties:
+        offset:
+          type: number
+          description: The number of items to skip before returning the results
+          format: int32
+          example: 10
+        limit:
+          type: number
+          description: The number of items to return
+          format: int32
+    PostOrderRetrieveResponse_pagination:
+      type: object
+      properties:
+        itemQuantity:
+          type: integer
+          description: total number of available orders
+          example: 40
+  responses:
+    BadRequest:
+      description: The request information it's not correct.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: You're not authorized to perform this operation.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: You don't have the right permissions to execute this operation.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: An error has occurred.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadGateway:
+      description: The service is not available.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    app-name:
+      name: app-name
+      in: header
+      description: Application Name - BackOffice | WebBanking | MobileToken
+      required: true
+      schema:
+        type: string
+        example: BackOffice
+    caller-name:
+      name: caller-name
+      in: header
+      description: Api name who request
+      required: true
+      schema:
+        type: string
+        example: bs-guided-experience
+    request-date:
+      name: request-date
+      in: header
+      description: Request Date | RFC 3339 Format
+      required: true
+      schema:
+        $ref: '#/components/schemas/request-date'
+      example: 2019-10-12 07:20:50.52Z
+    request-id:
+      name: request-id
+      in: header
+      description: Request Identifier
+      required: true
+      schema:
+        $ref: '#/components/schemas/request-id'
+    x-session:
+      name: x-session
+      in: header
+      description: Indicates the active session in which the user is transacting.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+    x-device:
+      name: x-device
+      in: header
+      description: Hash or identifier of the device.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 9939aadd00ee32
+    x-device-ip:
+      name: x-device-ip
+      in: header
+      description: IP address of origin of the request.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 200.10.89.34
+    x-language:
+      name: x-language
+      in: header
+      description: ISO – 639-1  – Language Code - 2 digit code.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        maxLength: 5
+        type: string
+    customer-affiliation-id:
+      name: customer-affiliation-id
+      in: header
+      description: Customer affiliated to business Banking
+      required: true
+      schema:
+        type: string
+        example: qwerccf-a60b-45e8-b5e3-215924834e5
+    customer-user-id:
+      name: customer-user-id
+      in: header
+      description: User executing the operation
+      required: true
+      schema:
+        type: string
+        example: qwerccf-a60b-45e8-b5e3-215924834e5

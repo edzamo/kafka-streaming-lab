@@ -1,0 +1,1628 @@
+---
+openapi: 3.0.0
+info:
+  title: API Support Banking Account
+  description: |
+    Support Api for retrieves customer accounts information.
+    > <b>Dominio de Servicio BIAN</b> `Current Account`<br>
+  version: 1.3.1
+externalDocs:
+  description: API Documentation
+  url: https://example.com/api-docs
+servers:
+  - url: http://localhost:8080/support/banking/v1
+    description: Development
+tags:
+  - name: Account
+    description: Account Controller
+  - name: Transaction
+    description: Transaction Controller
+  - name: Transaction Detail
+    description: Transaction Detail Controller
+paths:
+  /accounts:
+    get:
+      tags:
+        - Account
+      summary: Retrieves a List  of a customer's accounts.
+      description: |
+        ### Details: Retrieves a List of a customer's accounts with additional details by their document number and identification type.<br>
+      operationId: getAccountByFilter
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: id of request
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: X-Guid
+          in: header
+          description: Gateway | Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: biddid-2203033-diuhdud
+        - name: customerDocumentNumber
+          in: query
+          description: Customer identification document number.
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: "1721553616"
+        - name: customerDocumentType
+          in: query
+          description: Client identifier type. ID (0001) - Passport (0002) - RUC (0003).
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: "0001"
+        - name: accountsClassification
+          in: query
+          description: Accounts classification
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: CAC
+        - name: X-Agency
+          in: header
+          description: Gateway | Code of the agency where the user is registered.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 9
+            type: string
+            example: "21"
+        - name: X-Geolocation
+          in: header
+          description: Gateway | Describes the location where the transaction originates.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 20
+            type: string
+            example: "-0.120670,-78.483371"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountByFilterResponse'
+        "400":
+          description: The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "429":
+          description: "Too many requests to the resource {URI}"
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "504":
+          description: Gateway timeout. The service is excessive application processing time.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts/{accountId}:
+    get:
+      tags:
+        - Account
+      summary: Retrieves a customer's accounts.
+      description: |
+        ### Details: Retrieves a customer's accounts with additional details by their document number and identification type.<br>
+      operationId: getAccountById
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: id of request
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: accountId
+          in: path
+          description: Account id | account identification | account number
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: "1721553616"
+        - name: X-Guid
+          in: header
+          description: Gateway | Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: biddid-2203033-diuhdud
+        - name: X-Agency
+          in: header
+          description: Gateway | Code of the agency where the user is registered.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 9
+            type: string
+            example: "21"
+        - name: X-Geolocation
+          in: header
+          description: Gateway | Describes the location where the transaction originates.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 20
+            type: string
+            example: "-0.120670,-78.483371"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountByIdResponse'
+        "400":
+          description: The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "429":
+          description: "Too many requests to the resource {URI}"
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "504":
+          description: Gateway timeout. The service is excessive application processing time.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts/{accountId}/transactions:
+    get:
+      tags:
+        - Transaction
+      summary: Get transactions from account request.
+      description: |
+        ### Details
+
+          Returns transactions from an account.
+
+        ### Valid Uses of Parameters
+        | Expected result | Path Parameter | Query Parameter |
+        |--------------------|--------------- |-----------------|
+        |Get last moves        | accountId       | - |
+        |Get movements in a range of dates        | accountId        | fromOperationDate, toOperationDate |
+      operationId: getTransactionByAccountId
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: id of request
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: accountId
+          in: path
+          description: Account id | account identification | account number
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: "1721553616"
+        - name: accountTypeDescription
+          in: query
+          description: Description of account
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 21 = Saving account  | 22 = Current account
+        - name: limit
+          in: query
+          description: The number of items to return
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
+        - name: offset
+          in: query
+          description: transactioniId of last list of transactions (default = 0)
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: fromOperationDate
+          in: query
+          description: Initial date to obtain transactions.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: "12082021"
+        - name: toOperationDate
+          in: query
+          description: Final date to obtain transactions.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: "12082021"
+      responses:
+        "200":
+          description: Transactions account list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTransactionResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "504":
+          description: 504 Gateway timeout. The service is excessive application processing time.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts/transaction-details/search:
+    post:
+      tags:
+        - Transaction Detail
+      summary: Search the details of a transaction
+      description: |
+        ### Details:
+        Search the details of an account transaction.
+      operationId: postTransactionDetailSearch
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: id of request
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostTransactionDetailSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostTransactionDetailSearchResponse'
+              examples:
+                PostSearchTransactionDetails:
+                  $ref: '#/components/examples/PostTransactionDetailSearchResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts/transaction-details/digital-files/retrive:
+    post:
+      tags:
+        - Transaction Detail
+      summary: Retrive image of a transaction.
+      description: |
+        ### Details:
+        Retrive image of the details of an account transaction.
+      operationId: PostDigitalFileRetrive
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: id of request
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostDigitalFileRetriveRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDigitalFileRetriveResponse'
+              examples:
+                PostSearchTransactionDetails:
+                  $ref: '#/components/examples/PostDigitalFileRetriveResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    GetAccountByFilterResponse:
+      title: GetAccountByFilterResponse
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+    GetAccountByIdResponse:
+      $ref: '#/components/schemas/AccountByIdResponse'
+    Account:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Account identifier
+          example: "2100027661"
+        type:
+          $ref: '#/components/schemas/Account_type'
+        customer:
+          $ref: '#/components/schemas/Account_customer'
+        status:
+          $ref: '#/components/schemas/Account_status'
+        investment:
+          $ref: '#/components/schemas/Account_investment'
+        openingDate:
+          type: string
+          description: Investment Opening date.
+          example: "21022014"
+        endDate:
+          type: string
+          description: Investnebt End date.
+          example: "1606670"
+        currency:
+          $ref: '#/components/schemas/Account_currency'
+        ownerRole:
+          type: string
+          description: Account Owner Role.
+          example: PROPIETARIO
+        balanceInformation:
+          $ref: '#/components/schemas/Account_balanceInformation'
+        product:
+          $ref: '#/components/schemas/Account_product'
+        subProduct:
+          $ref: '#/components/schemas/Account_subProduct'
+      additionalProperties: false
+    AccountByIdResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Account identifier
+          example: "2100027661"
+        type:
+          $ref: '#/components/schemas/Account_type'
+        customer:
+          $ref: '#/components/schemas/AccountByIdResponse_customer'
+        status:
+          $ref: '#/components/schemas/Account_status'
+        openingDate:
+          type: string
+          description: Investment Opening date.
+          example: "21022014"
+        endDate:
+          type: string
+          description: Investnebt End date.
+          example: "1606670"
+        currency:
+          $ref: '#/components/schemas/Account_currency'
+        balanceInformation:
+          $ref: '#/components/schemas/Account_balanceInformation'
+        product:
+          $ref: '#/components/schemas/Account_product'
+        subProduct:
+          $ref: '#/components/schemas/AccountByIdResponse_subProduct'
+      additionalProperties: false
+    PostTransactionDetailSearchRequest:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Account id | account identification | account number
+          example: "1721553616"
+        transactions:
+          $ref: '#/components/schemas/TransactionDetail'
+    PostDigitalFileRetriveRequest:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Account id | account identification | account number
+          example: "1721553616"
+        transactions:
+          $ref: '#/components/schemas/TransactionDetail'
+        image:
+          $ref: '#/components/schemas/ImageRequest'
+    ImageRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Image type
+          example: imagenCheque
+        key:
+          type: string
+          description: Data Image
+          example: datosImagen
+        value:
+          type: string
+          description: Image value
+          example: 12*5*5*39392*765.40
+    TransactionDetail:
+      type: object
+      properties:
+        externalTransactionId:
+          type: string
+          description: Transaction Code
+          example: "0004"
+        internalTransactionId:
+          type: string
+          description: Document number
+          example: "207934"
+        description:
+          type: string
+          description: Bank Transaction Concept
+          example: TRANSFERENCIA_APP
+        operationDate:
+          type: string
+          description: "Date of the transaction, format DDMMYYYY"
+          example: "12112020"
+        type:
+          $ref: '#/components/schemas/TransactionDetailType'
+    TransactionDetailType:
+      type: object
+      properties:
+        code:
+          type: string
+          description: transaction type code
+          example: D
+    PostTransactionDetailSearchResponse:
+      title: PostTransactionDetailSearchResponse
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionsDetail'
+    PostDigitalFileRetriveResponse:
+      title: PostDigitalFileRetriveResponse
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionsDetail'
+    TransactionsDetail:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Clave
+        value:
+          type: string
+          description: Valor
+        description:
+          type: string
+          description: Etiqueta
+    GetTransactionResponse:
+      type: object
+      properties:
+        transactions:
+          $ref: '#/components/schemas/Transactions'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      properties:
+        offset:
+          type: string
+          description: Offset for new requests
+          example: "876559"
+    Transactions:
+      title: getTransactions
+      type: array
+      items:
+        $ref: '#/components/schemas/Transaction'
+    Transaction:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          description: transaction identificaion | documento
+          example: "12345678"
+        description:
+          type: string
+          description: transaction description
+          example: TRANSFERENCIA DIRECTA PRONACA
+        longDescription:
+          type: string
+          description: transaction long description
+          example: TRANSFERENCIA DIRECTA PRONACA
+        amount:
+          type: number
+          format: double
+        currency:
+          $ref: '#/components/schemas/Currency'
+        operationDate:
+          type: string
+          description: Operation Date
+          example: 2021-10-01
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        account:
+          $ref: '#/components/schemas/TransactionAccount'
+    TransactionAccount:
+      type: object
+      properties:
+        availableAmount:
+          type: number
+          format: double
+        currency:
+          $ref: '#/components/schemas/Currency'
+    Channel:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        name:
+          type: string
+          description: channel name
+          example: Ag. Norte
+    ChannelType:
+      type: object
+      properties:
+        code:
+          type: string
+          description: channel type code
+          example: O
+        description:
+          type: string
+          description: channel Type description
+          example: OFICINA
+    TransactionType:
+      type: object
+      properties:
+        code:
+          type: string
+          description: transaction type code
+          example: D
+        description:
+          type: string
+          description: transaction Type description
+          example: DEBITO
+    Currency:
+      type: object
+      properties:
+        code:
+          type: string
+          description: currency code | ISO-4217
+          example: USD
+        description:
+          type: string
+          description: currency description | ISO-4217
+          example: Dolares Americanos
+    Error:
+      required:
+        - developerMessage
+        - errorCode
+        - userMessage
+      type: object
+      properties:
+        errorCode:
+          maxLength: 6
+          pattern: "^[a-zA-Z]+$\\d+$"
+          type: string
+          example: "6"
+        developerMessage:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: Coding Error
+        userMessage:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: Error al validar dispositvo
+        moreInfo:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: ""
+        version:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: 1.0.0
+        status:
+          maxLength: 15
+          type: number
+          example: 409
+    request-date:
+      type: string
+    Account_type:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ""
+        description:
+          type: string
+          example: CTA.CTE PERSONAL
+      description: Kind of Product.
+    Account_customer_address:
+      type: object
+      properties:
+        summary:
+          type: string
+          description: Summary Client Address .
+          example: BONIPACUNBA S/N Y ANDRES PAREDES  ANDRES PAREDES
+      description: Client Address .
+    Account_customer:
+      type: object
+      properties:
+        fullname:
+          type: string
+          description: Client's Full Name.
+          example: BUSTAMANTE  MARQUEZ TAURIEL LISETTE
+        address:
+          $ref: '#/components/schemas/Account_customer_address'
+      description: Client Information.
+    Account_status:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Account Status code.
+          example: ""
+        description:
+          type: string
+          description: Account Status description.
+          example: CANCELADO
+      description: Account Status.
+    Account_investment:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Investment amount.
+          example: "5000.00"
+        rate:
+          type: string
+          description: Investment rate.
+          example: "2.99"
+        daysNumber:
+          type: string
+          description: Number of investment days.
+          example: "90"
+      description: Information related to investments.
+    Account_currency:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Currency Code.
+          example: USD
+        description:
+          type: string
+          description: Coin Description.
+          example: ' '
+      description: Account currency.
+    Account_balanceInformation:
+      type: object
+      properties:
+        availableAmount:
+          type: string
+          description: Available account balance.
+          example: "0.00"
+        countableAmount:
+          type: string
+          description: Accounting Balance of the account .
+          example: "0.00"
+      description: Information related to the balance.
+    Account_product:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Product Code.
+          example: "2101"
+        description:
+          type: string
+          description: Description Product.
+          example: ' '
+      description: Account Product.
+    Account_subProduct:
+      type: object
+      properties:
+        code:
+          type: string
+          description: By-product code.
+          example: "0001"
+        description:
+          type: string
+          description: By-product description.
+          example: ' '
+      description: Account by-product.
+    AccountByIdResponse_customer:
+      type: object
+      properties:
+        documentNumber:
+          type: string
+          description: Documento de identificación del cliente.
+          example: "0590058653001"
+        documentType:
+          type: string
+          description: Tipo del documento de identificación del cliente.
+          example: "3"
+        fullname:
+          type: string
+          description: Client's Full Name.
+          example: BUSTAMANTE  MARQUEZ TAURIEL LISETTE
+      description: Client Information.
+    AccountByIdResponse_subProduct:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código del sub-producto.
+          example: "1"
+        description:
+          type: string
+          description: Descrición del sub-producto.
+          example: ""
+      description: Sub-producto de la cuenta.
+  responses:
+    BadRequest:
+      description: 400 Bad Request. The request information it's not correct.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 401 Unauthorized.You're not authorized to perform this operation.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: 403 Forbidden. You don't have the right permissions to execute this operation.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 404 Not Found. The server cannot find the requested resource.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: 500 Internal Server Error. An error has occurred.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    GatewayTimeout:
+      description: 504 Gateway timeout. The service is excessive application processing time.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    GatewayError:
+      description: 502 Bad Gateway. The service unable to get a valid response.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    app-name:
+      name: app-name
+      in: header
+      description: Application Name - BackOffice | WebBanking | MobileToken
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: BackOffice
+    caller-name:
+      name: caller-name
+      in: header
+      description: Api name who request
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: bs-guided-experience
+    process-code:
+      name: process-code
+      in: header
+      description: Identifies the process or functionality
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: BJACAR01
+    request-id:
+      name: request-id
+      in: header
+      description: Request Identifier
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: id of request
+    request-date:
+      name: request-date
+      in: header
+      description: Request Date | RFC 3339 Format
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 2019-04-29 07:20:50.52Z
+    customer-affiliation-id:
+      name: customer-affiliation-id
+      in: header
+      description: Customer affiliated to business Banking
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: qwerccf-a60b-45e8-b5e3-215924834e5
+    customer-user-id:
+      name: customer-user-id
+      in: header
+      description: User executing the operation
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: qwerccf-a60b-45e8-b5e3-215924834e5
+    x-device:
+      name: x-device
+      in: header
+      description: Identifier of the device.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 9939aadd00ee32
+    x-device-ip:
+      name: x-device-ip
+      in: header
+      description: IP address of origin of the request.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 200.10.89.34
+    x-session:
+      name: x-session
+      in: header
+      description: Indicates the active session in which the user is transacting.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+    x-language:
+      name: x-language
+      in: header
+      description: ISO – 639-1  – Language Code - 2 digit code.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        maxLength: 5
+        type: string
+    accountId:
+      name: accountId
+      in: path
+      description: Account id | account identification | account number
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: "1721553616"
+    agency:
+      name: X-Agency
+      in: header
+      description: Gateway | Code of the agency where the user is registered.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        maxLength: 9
+        type: string
+        example: "21"
+    geolocation:
+      name: X-Geolocation
+      in: header
+      description: Gateway | Describes the location where the transaction originates.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        maxLength: 20
+        type: string
+        example: "-0.120670,-78.483371"
+    limitParam:
+      name: limit
+      in: query
+      description: The number of items to return
+      schema:
+        maximum: 100
+        minimum: 1
+        type: integer
+        format: int32
+        default: 20
+  examples:
+    SignatureGETStructure:
+      summary: Estructura GET
+      value: "{APP_ID} + '|' + {GUID} + '|' + {URI} + '|' + {API_SECRET}"
+    PostTransactionDetailSearchResponse:
+      value:
+        - key: numeroDocumento
+          value: "000207934"
+          description: Número de Documento
+        - key: descripcion
+          value: ""
+          description: Descripción
+        - key: numeroDocumento
+          value: "2204001820"
+          description: Cuenta Beneficiaria
+        - key: email
+          value: ""
+          description: Correo Electrónico de beneficiario
+        - key: beneficiario
+          value: ENDARA   MARIA BELEN
+          description: Nombre Beneficiario
+        - key: estado
+          value: PROCESADA
+          description: Estado de transferencia
+    PostDigitalFileRetriveResponse:
+      value:
+        - key: numeroDocumento
+          value: "000207934"
+          description: Número de Documento
+        - key: descripcion
+          value: ""
+          description: Descripción
+        - key: numeroDocumento
+          value: "2204001820"
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: x-api-key
+      in: header

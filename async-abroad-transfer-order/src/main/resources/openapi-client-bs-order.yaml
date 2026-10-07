@@ -1,0 +1,458 @@
+openapi: 3.0.1
+info:
+  title: Api Business - Banking Order V1
+  description: Business API for user managemenet
+  version: 1.0.1
+servers:
+  - url: http://localhost:8080/business/banking/v1
+    description: Development
+tags:
+  - name: "Order"
+    description: "Order Controller"
+
+paths:
+  /orders:
+    post:
+      tags:
+        - Order
+      summary: Register a new Order
+      description: >+
+        ### Description
+          Save a new order for the approval engine to handle.
+      operationId: postOrder
+      parameters:
+        - $ref: '#/components/parameters/channel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOrderRequest"
+      responses:
+        200:
+          description: New Order was save.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/PostOrderResponse"
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/{orderId}:
+    patch:
+      tags:
+        - Order
+      summary: Update an Order
+      description: >+
+        ### Description
+          Update an Order previously registered Order. Change the status order.
+      operationId: patchOrder
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          example: 5674
+          schema:
+            type: integer
+            format: int64
+          description: Id of order
+          x-mapping: "approval_order/order_order_id"
+        - $ref: '#/components/parameters/channel'
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/PatchOrderRequest"
+        required: true
+      responses:
+        200:
+          description: New event was save.
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /orders/approve:
+    post:
+      tags:
+        - Order
+      summary: Approve batch orders.
+      description: >+
+        ### Description
+          Approve batch orders, the only actions that the engine supports for this type of process are: **TO APPROVE** and **TO_APPROVAL**.
+      operationId: postOrderApprove
+      parameters:
+        - $ref: '#/components/parameters/channel'
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/PostOrderApproveRequest"
+        required: true
+      responses:
+        200:
+          description: successful order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                items:
+                  $ref: "#/components/schemas/PostOrderApproveResponse"
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+components:
+  parameters:
+    channel:
+      in: header
+      name: channel
+      required: true
+      example: Banking
+      schema:
+        type: string
+      description: Channel through which the change is being generated.
+      x-mapping: "approval_order/channel"
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+      properties:
+        productId:
+          description: Product Id
+          type: string
+          example: "1234125634-2145317381732"
+          x-mapping: "approval_order/core_id"
+        name:
+          description: product name | type product
+          type: string
+          example: "TX_INTERNATIONAL"
+          x-mapping: "approval_order/type"
+        description:
+          type: string
+          description: Description of products
+          example: "International Transfers"
+    Currency:
+      title: Currency
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "USD"
+          description: Code of currency used in the new Order.
+          x-mapping: "approval_order/currency_code"
+        description:
+          type: string
+          description: Name of currency used in the new Order
+          example: "Dolares Americanos"
+    Action:
+      title: Action
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "TO_PENDING"
+          description: "Action code of Order order"
+          x-mapping: "approval_order/action"
+        description:
+          type: string
+          description: "Action name of Order order"
+          example: ""
+    PatchOrderRequest:
+      type: object
+      required:
+        - customerUser
+        - action
+      properties:
+        customerUser:
+          $ref: "#/components/schemas/CustomerUser"
+        action:
+          $ref: "#/components/schemas/Action"
+        amount:
+          type: number
+          format: double
+          example: 50000.90
+          description: Amount of the Order.
+        message:
+          type: string
+          description: "Message of process update order"
+          example: "Rejected, the approval date is wrong"
+    PostOrderRequest:
+      type: object
+      required:
+        - customerProductId
+        - customerUser
+        - product
+        - currency
+        - startDate
+        - expirationDate
+        - customerAffiliationId
+        - action
+      properties:
+        customerProductId:
+          description: Product Id
+          type: string
+          example: "21134545678"
+          x-mapping: "approval_order/company_contract_product_uuid"
+        customerUser:
+          $ref: "#/components/schemas/CustomerUser"
+        product:
+          $ref: "#/components/schemas/Product"
+        amount:
+          type: number
+          format: double
+          example: 50000.90
+          description: Amount of the Order.
+        currency:
+          $ref: "#/components/schemas/Currency"
+        startOrderDate:
+          type: string
+          example: "2022-03-16T00:00:00Z"
+          description: "Start Date to execute the order like collect money."
+        endOrderDate:
+          type: string
+          example: "2022-03-16T00:00:00Z"
+          description: "End Date to execute the order like collect money."
+        expirationDate:
+          type: string
+          example: "2022-03-16T00:00:00Z"
+          description: Order expiration date
+        customerAffiliationId:
+          type: string
+          example: "1235454-74v87as85"
+          description: "Id of company who generate the new Order."
+          x-mapping: "approval_order/company_contract_uuid"
+        action:
+          $ref: "#/components/schemas/Action"
+        orderItem:
+          $ref: "#/components/schemas/OrderItem"
+    OrderItem:
+      type: object
+      properties:
+        identificationValue:
+          description: value for get a counterpart
+          type: string
+          example: "17913233"
+          x-mapping: "billId"
+        beneficiary :
+          $ref: "#/components/schemas/Beneficiary"
+    Beneficiary:
+      title: Benefeciary
+      type: object
+      properties:
+        fullName:
+          description: Beneficiary Full Name
+          type: string
+          example: "Full Name"
+          x-mapping: "approval_order/fullName"
+    OrderStatus:
+      title: OrderStatus
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "PENDING"
+          description: "Status code of Orders"
+          x-mapping: "approval_order/status"
+        description:
+          type: string
+          description: "Name of status of Orders"
+          example: ""
+    PostOrderResponse:
+      type: object
+      required:
+        - orderId
+      properties:
+        orderId:
+          type: integer
+          format: int64
+          example: 1
+          description: Id of order.
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+    CustomerUser:
+      type: object
+      required:
+        - customerUserId
+      properties:
+        customerUserId:
+          type: string
+          example: "21215-2135454-21544"
+          description: Id of user who performs an action.
+          x-mapping: "approval_order/user_company_contract_uuid"
+
+    ActionPostOrderApprove:
+      title: ActionPostOrderApprove
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum: [TO_APPROVAL, TO_APPROVE]
+          example: "TO_APPROVAL"
+          description: "Action code of Order order"
+          x-mapping: "approval_order/action"
+        description:
+          type: string
+          description: "Name of the action that the engine is expected to execute"
+          example: ""
+    PostOrderApproveRequest:
+      type: object
+      required:
+        - orderIds
+        - customerUser
+        - ActionPostOrderUpdate
+      properties:
+        orderIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+            example: 1
+            description: Ids of order.
+        customerUser:
+          $ref: "#/components/schemas/CustomerUser"
+        action:
+          $ref: "#/components/schemas/ActionPostOrderApprove"
+    ApprovalStatus:
+      title: StatusProcess
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "ERROR"
+          description: "Status of approval process"
+          x-mapping: "approval_order/status"
+        description:
+          type: string
+          description: "Description of approval process"
+          example: "The user does not have the permissions to execute the approval"
+    PostOrderApproveResponse:
+      type: object
+      required:
+        - orderId
+      properties:
+        orderId:
+          type: integer
+          format: int64
+          example: 1
+          description: Id of order.
+        approvalStatus:
+          $ref: "#/components/schemas/ApprovalStatus"
+    Error:
+      type: object
+      additionalProperties: false
+      properties:
+        errorCode:
+          type: string
+          pattern: ^[a-zA-Z]+$\d+$
+          maxLength: 6
+        developerMessage:
+          type: string
+          pattern: ^[a-zA-Z\s]*$
+          maxLength: 256
+        userMessage:
+          type: string
+          pattern: ^[a-zA-Z\s]*$
+          maxLength: 256
+        moreInfo:
+          type: string
+          pattern: ^[a-zA-Z\s]*$
+          maxLength: 256
+        version:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: "1.0.0"
+        status:
+          maxLength: 15
+          type: integer
+          example: 409

@@ -1,0 +1,349 @@
+openapi: 3.0.1
+info:
+  title: Api Support - Banking Approval Engine Scheduled Task V1
+  description: Support API to manage the approval engine scheduled tasks
+  version: 1.0.1
+servers:
+  - url: http://localhost:8080/support/banking/v1
+    description: Development
+tags:
+  - name: "Approval Engine Scheduled Task"
+    description: "Approval Engine Scheduled Task Controller"
+
+paths:
+  /approval-engine-scheduled-tasks:
+    post:
+      tags:
+        - Approval Engine Scheduled Task
+      summary: Register a new scheduled task
+      description: >+
+        ### Description
+          Register a new scheduled task which must contain the data required to execute an order status update and the date on which the notification must be sent to the product topic.
+      operationId: postApprovalScheduledTask
+      parameters:
+        - $ref: '#/components/parameters/channel'
+        - $ref: '#/components/parameters/customerUserId'
+        - $ref: '#/components/parameters/customerAffiliationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostApprovalScheduledTaskRequest"
+      responses:
+        200:
+          description: New Scheduled Task was register successfully.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/PostScheduledTaskResponse"
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /approval-engine-scheduled-tasks/{approvalEngineScheduledTaskId}:
+    patch:
+      tags:
+        - Approval Engine Scheduled Task
+      summary: Update an Scheduled Task
+      description: >+
+        ### Description
+          Update an scheduled task previously registered. Updatable values correspond only to the action and the sheduled date.
+      operationId: patchScheduledTask
+      parameters:
+        - $ref: '#/components/parameters/channel'
+        - $ref: '#/components/parameters/customerUserId'
+        - $ref: '#/components/parameters/customerAffiliationId'
+        - in: path
+          name: approvalEngineScheduledTaskId
+          required: true
+          example: 5674
+          schema:
+            type: string
+          description: Id of approval engine scheduled task.
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/PatchScheduledTaskRequest"
+        required: true
+      responses:
+        200:
+          description: Scheduled task was update successfully.
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Approval Engine Scheduled Task
+      summary: Remove an Scheduled Task
+      description: >+
+        ### Description
+          Remove an previously registered Scheduled Task.
+      operationId: deleteScheduledTask
+      parameters:
+        - $ref: '#/components/parameters/channel'
+        - $ref: '#/components/parameters/customerUserId'
+        - $ref: '#/components/parameters/customerAffiliationId'
+        - in: path
+          name: approvalEngineScheduledTaskId
+          required: true
+          example: 5674
+          schema:
+            type: string
+          description:  Id of approval engine scheduled task.
+      responses:
+        200:
+          description: Scheduled task was remove successfully.
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+components:
+  parameters:
+    channel:
+      in: header
+      name: channel
+      required: true
+      example: Banking
+      schema:
+        type: string
+      description: Channel through which the change is being generated.
+      x-mapping: "approval_order/channel"
+    customerUserId:
+      in: header
+      name: customer-user-id
+      required: true
+      schema:
+        type: string
+      description: Id of user who invoke the service
+      example: "4085b199-5994-4016-ad0c-e28486c59008"
+    customerAffiliationId:
+      in: header
+      name: customer-affiliation-id
+      required: true
+      schema:
+        type: string
+      description: Id of company to which the requesting user belongs.
+      example: "4085b199-5994-4016-ad0c-e28486c59002"
+  schemas:
+    Product:
+      description: Data of product template
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          description: product name | type product
+          type: string
+          example: "TX_INTERNATIONAL"
+          x-mapping: "approval_order/type"
+    PatchOrder:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          $ref: "#/components/schemas/Action"
+    Action:
+      title: Action
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "TO_EXPIRE"
+          description: "Action to be executed on the scheduled date"
+          x-mapping: "approval_order/action"
+        description:
+          type: string
+          description: "Description of the action to be executed on the scheduled date"
+          example: ""
+    PatchScheduledTaskRequest:
+      type: object
+      required:
+        - customerUser
+        - action
+      properties:
+        order:
+          $ref: "#/components/schemas/PatchOrder"
+        sheduledDate:
+          type: string
+          format: date-time
+          example: "2022-03-16T00:00:00Z"
+          description: "Date on which the information of the scheduled task will be sent to the products topic"
+
+
+    PostApprovalScheduledTaskRequest:
+      type: object
+      required:
+        - order
+        - sheduledDate
+      properties:
+        order:
+          $ref: "#/components/schemas/PostOrder"
+        sheduledDate:
+          type: string
+          format: date-time
+          example: "2022-03-16T00:00:00Z"
+          description: "Date on which the information of the scheduled task will be sent to the products topic"
+
+    PostOrder:
+      type: object
+      required:
+        - orderId
+        - product
+        - action
+        - status
+      properties:
+        orderId:
+          type: integer
+          format: int64
+          example: 1
+          description: Order's Id.
+        action:
+          $ref: "#/components/schemas/Action"
+        product:
+          $ref: "#/components/schemas/Product"
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+
+    OrderStatus:
+      title: OrderStatus
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "PENDING"
+          description: "Current status code of Order"
+          x-mapping: "approval_order/status"
+        description:
+          type: string
+          description: "Current name of status of Order"
+          example: ""
+
+    PostScheduledTaskResponse:
+      type: object
+      required:
+        - approvalEngineScheduledTaskId
+      properties:
+        approvalEngineScheduledTaskId:
+          type: string
+          example: TO_EXPIRE.1
+          description: Id of scheduled task.
+
+
+    Error:
+      type: object
+      properties:
+        title:
+          maximum: 50
+          type: string
+          description: Mensaje de error técnico.
+        detail:
+          maximum: 50
+          type: string
+          description: Mensaje a presentar al cliente.
+        instance:
+          maximum: 50
+          type: string
+          description: Código de catálogo de errores.
+        type:
+          maximum: 100
+          type: string
+          description: Dirección de la fuente solicitada por el proxy
+        resource:
+          maximum: 100
+          type: string
+          description: Recurso del servicio en el que se produjo el error.
+        component:
+          maximum: 100
+          type: string
+          description: Componente del servicio en el que sucedió el error.
+        backend:
+          maximum: 100
+          type: string
+          description: Código de error interno.

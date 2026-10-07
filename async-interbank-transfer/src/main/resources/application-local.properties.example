@@ -1,0 +1,67 @@
+server.port=8082
+management.endpoints.web.base-path=/support/banking/v1/async-interbank-transfer-v1/actuator/
+management.endpoints.web.exposure.include=*
+
+#PROYECT
+info.project.name= async-interbank-transfer
+spring.application.name=async-interbank-transfer
+info.project.version= 1.0.0
+spring.main.allow-bean-definition-overriding=on
+spring.jackson.date-format=com.example.banking.services.RFC3339DateFormat
+spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
+
+## CONNECTION TO BUS EVENT
+spring.cloud.stream.kafka.binder.brokers=${EVENTHUB_HOST}:${EVENTHUB_PORT:9093}
+spring.cloud.stream.bindings.output.destination=tx_eng.interbank
+spring.cloud.stream.kafka.binder.configuration.sasl.mechanism=PLAIN
+spring.cloud.stream.kafka.binder.configuration.security.protocol=SASL_SSL
+spring.cloud.stream.kafka.binder.configuration.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://${EVENTHUB_HOST}/;SharedAccessKeyName=${EVENTHUB_KEY_NAME};SharedAccessKey=${EVENTHUB_SHARED_ACCESS_KEY}";
+
+#READ THE EVENTS TOPIC
+spring.cloud.function.definition=receive
+spring.cloud.stream.bindings.receive-in-0.destination=tx_eng.interbank
+spring.cloud.stream.bindings.receive-in-0.destination.group=approval-order-engine-consumer
+# WRITE INTO THE TOPIC
+spring.cloud.stream.bindings.retry-out-0.destination=tx_eng.interbank
+
+spring.cloud.stream.bindings.receive-in-0.consumer.maxAttempts=3
+spring.cloud.stream.bindings.receive-in-0.consumer.backOffInitialInterval=500
+spring.cloud.stream.bindings.receive-in-0.consumer.backOffMaxInterval=1000
+spring.cloud.stream.bindings.receive-in-0.consumer.backOffMultiplier=2.0
+
+#http-client.api.client-bsInterbankTransferOrder.base-url=bs-interbank-transfer-order/business/banking/v1/
+#http-client.api.client-spInterbankTransferOrder.base-url=sp-interbank-transfer-order/support/banking/v1/
+http-client.api.client-spInterbankTransferOrder.base-url=http://localhost:8081/support/banking/v1/
+http-client.api.client-bsInterbankTransferOrder.base-url=http://localhost:8083/business/banking/v1/
+http-client.api.client-bsOrder.base-url=bs-order/business/banking/v1/
+
+#Redis
+spring.redis.host=${REDIS_HOST}
+spring.redis.port=6380
+spring.redis.password=${REDIS_PASSWORD}
+spring.redis.database=0
+spring.redis.ssl=true
+management.health.redis.enabled=false
+
+SEG_INTERVAL=30
+SEG_INTERVAL_LIMIT=120
+SEG_INTERVAL_INIT=0
+ERROR_LAST_STEP=ERROR
+STATUS_LAST_STEP=TO_SUCCESS
+USER_SYSTEM_DIRECT_TRANSFER=$PRODUCT_TRANSFER
+CLAIM_NAME=INTERBANK
+X_GUID=fff
+X_DEVICE=san
+X_DEVICE_IP=127.0.0.1
+X_SESSION=ggg
+X_AGENCY=eeeee
+X_GEOLOCATION=dddd
+X_GATEWAY_CREDENTIALS=credentials
+X_SIGNATURE=signature
+
+app.name=Banking
+execute.order.process.code=INTERBANK04
+modify.order.process.code=INTERBANK02
+default.header.x-device=localhost
+default.header.x-device-ip=127.0.0.1
+

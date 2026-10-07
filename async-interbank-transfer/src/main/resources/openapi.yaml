@@ -1,0 +1,122 @@
+openapi: 3.0.2
+info:
+  title: API Support - Banking Async Interbank Transfer V1
+  description: Support API to manage the Interbank Transfer
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/support/banking/v1
+    description: Development
+tags:
+  - name: "Interbank transfer"
+    description: "InterbankTransferOrder Controller"
+paths:
+  /async-interbank-transfer-v1:
+    post:
+      tags:
+        - Interbank transfer
+      summary: Register a new Order
+      description: >+
+        ### Description
+          Save a new order for the approval engine to handle.
+      operationId: postInterbankTransfer
+      parameters:
+        - $ref: '#/components/parameters/channel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInterbankTransferRequest"
+      responses:
+        200:
+          description: New Order was save.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/PostInterbankTransferResponse"
+        409:
+          description: The information are not valid.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: You're not authorized to perform this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: You don't have the right permissions to execute this Order.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        502:
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  parameters:
+    channel:
+      in: header
+      name: channel
+      required: true
+      example: Banking
+      schema:
+        type: string
+      description: Channel through which the change is being generated.
+      x-mapping: "approval_order/channel"
+  schemas:
+    PostInterbankTransferRequest:
+      type: object
+      required:
+        - message
+      properties:
+        customerUser:
+          description: Product Id
+          type: string
+          example: "mensaje"
+    PostInterbankTransferResponse:
+      type: object
+      properties:
+        mesaggerResponses:
+          type: string
+          description: Product Id
+          example: "Respuesta"
+    Error:
+      type: object
+      additionalProperties: false
+      properties:
+        errorCode:
+          type: string
+          pattern: ^[a-zA-Z]+$\d+$
+          maxLength: 6
+        developerMessage:
+          type: string
+          pattern: ^[a-zA-Z\s]*$
+          maxLength: 256
+        userMessage:
+          type: string
+          pattern: ^[a-zA-Z\s]*$
+          maxLength: 256
+        moreInfo:
+          type: string
+          pattern: ^[a-zA-Z\s]*$
+          maxLength: 256
+        version:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: "1.0.0"
+        status:
+          maxLength: 15
+          type: integer
+          example: 409

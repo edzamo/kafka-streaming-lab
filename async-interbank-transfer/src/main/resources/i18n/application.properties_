@@ -1,0 +1,44 @@
+server.port=8080
+management.endpoints.web.base-path=/support/banking/v1/consumer/actuator/
+management.endpoints.web.exposure.include=*
+management.health.redis.enabled=false
+
+#PROYECT
+info.project.name= async-interbank-transfer
+spring.application.name=async-interbank-transfer
+info.project.version= 1.0.0
+spring.main.allow-bean-definition-overriding=on
+spring.jackson.date-format=com.example.banking.services.RFC3339DateFormat
+spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
+
+## CONNECTION TO BUS EVENT
+spring.cloud.stream.kafka.binder.brokers=${EVENTHUB_HOST}:${EVENTHUB_PORT:9093}
+spring.cloud.stream.bindings.output.destination=fx_orders_detail
+spring.cloud.stream.kafka.binder.configuration.sasl.mechanism=PLAIN
+spring.cloud.stream.kafka.binder.configuration.security.protocol=SASL_SSL
+spring.cloud.stream.kafka.binder.configuration.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://${EVENTHUB_HOST}/;SharedAccessKeyName=${EVENTHUB_KEY_NAME};SharedAccessKey=${EVENTHUB_SHARED_ACCESS_KEY};EntityPath=${EVENTHUB_NAME}";
+
+## BUS EVENT DEV
+spring.cloud.function.definition=consume
+spring.cloud.stream.bindings.consume-in-0.destination=fx_orders_detail
+# Group
+#spring.cloud.stream.bindings.consume-in-0.destination.group=${ENGINE_EVENTHUB_DESTINATION_GROUP}
+
+###To define the stream bridge
+spring.cloud.stream.source=operationTray
+spring.cloud.stream.bindings.operationTray-out-0.destination=fx_orders_detail
+
+spring.cloud.stream.bindings.consume-in-0.consumer.maxAttempts=3
+spring.cloud.stream.bindings.consume-in-0.consumer.backOffInitialInterval=500
+spring.cloud.stream.bindings.consume-in-0.consumer.backOffMaxInterval=1000
+spring.cloud.stream.bindings.consume-in-0.consumer.backOffMultiplier=2.0
+
+
+
+
+
+
+
+
+
+

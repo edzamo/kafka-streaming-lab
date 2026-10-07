@@ -1,0 +1,4098 @@
+---
+openapi: 3.0.0
+info:
+  title: Api Business- Banking  Abroad Transfer Order V1
+  description: |
+    API Business For Manage Abroad Transfer Order <br>
+    > <b>Dominio de Servicio BIAN</b> `Payment Order.`<br>
+  version: 1.4.3
+externalDocs:
+  description: API Documentation
+  url: https://example.com/api-docs
+servers:
+  - url: http://localhost:8080/business/banking/v1
+    description: Development
+tags:
+  - name: Abroad Transfer Order
+    description: Abroad Transfer Order Controller
+  - name: Banking Product Parameter
+    description: Banking Product Parameter Controller
+  - name: Country
+    description: Country Controller
+  - name: Recipient Financial Entity
+    description: Recipient Financial Entity Controller
+  - name: Remittance Tax
+    description: Remittance Tax Controller
+  - name: Customer Tax Report
+    description: Customer Tax Report Controller
+  - name: Exemption File
+    description: Exemption File Controller
+  - name: Abroad Transfer Reason
+    description: Abroad Transfer Reason Controller
+  - name: Abroad Transfer Authorization
+    description: Abroad Transfer Authorization Controller
+paths:
+  /abroad-transfer-orders:
+    get:
+      tags:
+        - Abroad Transfer Order
+      summary: Return the Abroad Transfer Order information
+      description: "### Details:\n   Retrieve the Abroad Transfer Order information by filter\n### Valid use of parameters:\n| Expected result | Path Parameter | Query Parameter |\n|--------------------|--------------- |-----------------|\n|Retrieve an abroad transfer order complete| - |  moreData=additionalData  |\n|Retrieve an abroad transfer order with currency buy| - |  moreData=currencyExchange  |\n|Retrieve an order history| - |  moreData=orderHistory  |\n### The combination described above are the only possible combinations of parameters, other combinations will return error.          \n"
+      operationId: GetAbroadTransferOrderByFilter
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+        - name: trayOrderId
+          in: query
+          description: Id Tray Order
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 01906096-eb18-432b-a9ac-0aa5e80ebe9a
+        - name: moreData
+          in: query
+          description: indicates additional resources to retrieve
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: "additionalData, currencyExchange, orderHistory"
+      responses:
+        "200":
+          description: Retrieve the Abroad Transfer Order information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAbroadTransferOrderByFilterResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Abroad Transfer Order
+      summary: Create an Abroad Transfer Order
+      description: |
+        ### Details:
+        Create an Abroad Transfer Order and return an Abroad Transfer Order Id
+      operationId: PostAbroadTransferOrder
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+      requestBody:
+        description: Request to post the AbroadTransferOrder
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAbroadTransferOrderRequest'
+        required: true
+      responses:
+        "200":
+          description: Order creation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostAbroadTransferOrderResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/{abroadTransferOrderId}:
+    patch:
+      tags:
+        - Abroad Transfer Order
+      summary: Update Abroad Transfer Order.
+      description: |
+        ### Details:
+        Update an Abroad Transfer Order
+      operationId: PatchAbroadTransferOrder
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+        - name: abroadTransferOrderId
+          in: path
+          description: Abroad Transfer Order Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.abroad_transfer_order_uuid
+        - name: action
+          in: query
+          description: Action Order
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: "TO_PENDING, TO_MODIFY"
+      requestBody:
+        description: Request to post the AbroadTransferOrder
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAbroadTransferOrderRequest'
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchAbroadTransferOrderResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/download:
+    post:
+      tags:
+        - Abroad Transfer Order
+      summary: Download Abroad Transfer Order Details File
+      description: |+
+        ### Details:
+
+        Download Abroad Transfer Order Details File
+
+        It receives information from the order that will then be transformed into a bit format for the download of a file.
+
+      operationId: PostAbroadTransferOrderDownload
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+      requestBody:
+        description: Request Information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAbroadTransferOrderDownloadRequest'
+        required: true
+      responses:
+        "200":
+          description: Abroad transfer order image
+          content:
+            image/jpeg:
+              schema:
+                $ref: '#/components/schemas/PostAbroadTransferOrderDownloadResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/banking-product-parameters:
+    get:
+      tags:
+        - Banking Product Parameter
+      summary: Retrieves a list of banking product parameter.
+      description: |
+        ### Details:
+        Retrieves a list of banking product parameters by ProductName and name
+        ### Valid use of parameters:
+        | Expected result | Path Parameter | Query Parameter |
+        |--------------------|--------------- |-----------------|
+        |Retrieve a banking product parameters list by productName | - | productName |
+        |Retrieve a banking product parameters list by productName and name | - | productName, name |
+        ### The combination described above are the only possible combinations of parameters, other combinations will return error.
+      operationId: GetBankingProductParameterByFilter
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+        - name: productName
+          in: query
+          description: Product operation name
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: ABROAD
+          x-mapping: product_operation.name
+        - name: name
+          in: query
+          description: Product Parameter code
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: KIND_EXPENSIVE
+          x-mapping: product_parameter.code_parameter
+      responses:
+        "200":
+          description: List of banking product parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBankingProductParametersByFilterResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/countries:
+    get:
+      tags:
+        - Country
+      summary: Retrieves a list of countries.
+      description: |
+        ### Details:
+        Retrieves a list of countries.
+      operationId: GetCountry
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+      responses:
+        "200":
+          description: List of countries basic information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCountryResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/recipient-financial-entities:
+    get:
+      tags:
+        - Recipient Financial Entity
+      summary: Retrieves a list of Recipient Financial Entity.
+      description: |
+        ### Details:
+        Retrieves a list of Recipient Financial Entity.
+      operationId: GetRecipientFinancialEntity
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+        - name: swiftCode
+          in: query
+          description: Search by swiftCode.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: FINAPEPLXXX
+      responses:
+        "200":
+          description: List of Recipient Financial Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRecipientFinancialEntityResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/remittance-taxes:
+    get:
+      tags:
+        - Remittance Tax
+      summary: Returns the catalog of exceptions belonging to the ISD category.
+      description: |
+        ### Details:
+
+        Returns the catalog of exceptions belonging to the ISD category.
+
+        | Expected Result  | Path Parameter | Query Parameter                 |
+        | ---------------- | ------------   | -----------------------------------|
+        | Retrieves a list of remittance taxes by category| - | categoryID  |
+      operationId: GetRemittanceTax
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+        - name: categoryID
+          in: query
+          description: Search by categories.
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: ISD
+      responses:
+        "200":
+          description: List international banks basic information.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/GetRemittanceTaxResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/remittance-taxes/customer-tax-reports/retrieve:
+    post:
+      tags:
+        - Customer Tax Report
+      summary: "Retrieve the ISD information related to the client:quota used, quota available."
+      description: |
+        ### Details:
+        Retrieve the ISD information related to the client: quota used, quota available.
+      operationId: PostCustomerTaxReportRetrieve
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+      requestBody:
+        description: Information used to calculate the ISD values
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCustomerTaxReportRetrieveRequest'
+        required: true
+      responses:
+        "200":
+          description: Tax report retireved
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/PostCustomerTaxReportRetrieveResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/exemption-files/download:
+    post:
+      tags:
+        - Exemption File
+      summary: Method for get a signed url to upload or download a file.
+      description: |
+        ### Details:
+        Method for get a signed url to upload or download a file.
+      operationId: PostExemptionType
+      parameters:
+        - name: X-Guid
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: b292bed18ac34a26bdc021ace9033b19
+        - name: X-Device
+          in: header
+          description: Hash or identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: X-Device-Ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: X-Session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: X-Agency
+          in: header
+          description: Code of the agency where the user is registered.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 9
+            type: string
+            example: "21"
+        - name: X-Geolocation
+          in: header
+          description: Describes the geolocation where the transaction originates.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            maxLength: 20
+            type: string
+            example: "-0.120670,-78.483371"
+        - name: productName
+          in: query
+          description: Product operation name
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: ABROAD
+        - name: name
+          in: query
+          description: Product parameter code
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: KIND_EXPENSIVE
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostExemptionTypeRequest'
+        required: true
+      responses:
+        "200":
+          description: Get a signed url to upload or download a file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetExemptionTypeResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+      deprecated: true
+  /abroad-transfer-orders/abroad-transfer-reasons:
+    get:
+      tags:
+        - Abroad Transfer Reason
+      summary: Obtains the catalog of economic reasons.
+      description: |
+        ### Details:
+          Obtains the catalog of economic reasons for the instrumentation of transfers abroad.
+      operationId: GetAbroadTransferReason
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+      responses:
+        "200":
+          description: Obtains the catalog of economic reasons.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAbroadTransferReasonResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/exemption-files:
+    get:
+      tags:
+        - Exemption File
+      summary: Method consult information about uploading and downloading files..
+      description: |+
+        ### Details:
+        Method consult information about uploading and downloading files..
+
+          ### Valid use of parameters:
+
+        | Expected result | Path Parameter | Query Parameter |
+        |--------------------|--------------- |-----------------|
+        |   The file ISD download url is consulted according by trayOrderId | - | trayOrderId|
+        |  The file ISD upload or download is consulted according by fileTransferMethod | - | fileTransferMethod|
+
+      operationId: GetExemptionFile
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+        - name: claim
+          in: query
+          description: Indicates the type of product (ABROAD is for international transfers same currency and ABROADCX for international transfers other currencies)
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: "ABROAD ,ABROADCX"
+        - name: fileTransferMethod
+          in: query
+          description: file Transfer Method
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: "upload, download"
+        - name: trayOrderId
+          in: query
+          description: tray Order Id
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: "12345"
+      responses:
+        "200":
+          description: Successful search.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetExemptionFileResponse'
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /abroad-transfer-orders/abroad-transfer-authorization/execute:
+    post:
+      tags:
+        - Abroad Transfer Authorization
+      summary: Execute an international transfer.
+      description: |
+        ### Details:
+         Execute an international transfer from Example Bank between accounts with the same or different currencies.
+      operationId: PostAbroadTransferExcute
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: businessBanking
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 2019-10-12 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: customer Affilition Id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+          x-mapping: abroad_transfer_order.company_contract_uuid
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+          x-mapping: user_company_contract.user_company_contract_uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAbroadTransferExcuteRequest'
+        required: true
+      responses:
+        "200":
+          description: Transaction execution is successful.
+        "400":
+          description: 400 Bad Request. The request information it's not correct.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 401 Unauthorized.You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: 403 Forbidden. You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 404 Not Found. The server cannot find the requested resource.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: 500 Internal Server Error. An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: 502 Bad Gateway. The service unable to get a valid response.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    PostAbroadTransferExcuteRequest:
+      type: object
+      properties:
+        trayOrderId:
+          type: string
+          example: "14303"
+        businessFlow:
+          type: string
+          description: Indicates whether the operation flow is initial or approval.
+          example: initiate or approve
+        instructedAmount:
+          $ref: '#/components/schemas/InstructedAmountExecute'
+        creditor:
+          $ref: '#/components/schemas/CreditorExecute'
+        debtor:
+          $ref: '#/components/schemas/DebtorExecute'
+        supplementaryData:
+          $ref: '#/components/schemas/SupplementaryDataExecute'
+        exchangeRateInformation:
+          $ref: '#/components/schemas/PostAbroadTransferExcuteRequest_exchangeRateInformation'
+    SupplementaryDataExecute:
+      type: object
+      properties:
+        intermediaryAccount:
+          $ref: '#/components/schemas/SupplementaryDataExecute_intermediaryAccount'
+        creditorInstructedAmount:
+          $ref: '#/components/schemas/SupplementaryDataExecute_creditorInstructedAmount'
+        isd:
+          $ref: '#/components/schemas/SupplementaryDataExecute_isd'
+        transaction:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction'
+        supplementaryReasonData:
+          $ref: '#/components/schemas/SupplementaryDataExecute_supplementaryReasonData'
+        messageChannelDetail:
+          $ref: '#/components/schemas/SupplementaryDataExecute_messageChannelDetail'
+        swiftMessage:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage'
+        additionalFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplementaryDataExecute_additionalFields'
+    DebtorExecute:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/DebtorExecute_account'
+    CreditorExecute:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/CreditorExecute_account'
+    InstructedAmountExecute:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: "621.55"
+        currency:
+          $ref: '#/components/schemas/InstructedAmountExecute_currency'
+    PostCustomerTaxReportRetrieveRequest:
+      required:
+        - abroadTransferInformation
+        - customer
+        - hasIsdException
+      type: object
+      properties:
+        customer:
+          $ref: '#/components/schemas/Customer'
+        abroadTransferInformation:
+          $ref: '#/components/schemas/Transaction'
+        isdExemption:
+          type: boolean
+          description: Tax ID.
+          example: true
+    PostCustomerTaxReportRetrieveResponse:
+      type: object
+      properties:
+        isd:
+          $ref: '#/components/schemas/Isd'
+        exemption:
+          $ref: '#/components/schemas/ExemptionValue'
+        fee:
+          $ref: '#/components/schemas/Fee'
+    Fee:
+      type: object
+      properties:
+        feeId:
+          type: string
+          description: comp_cont_fee_uuid
+          example: 76945GG5-0187-47UU-81F7-C1E2B91RRECD5
+        value:
+          type: number
+          description: value exempted
+          example: 211
+    ExemptionValue:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: value exempted
+          example: 22.25
+        quotaAvailable:
+          type: number
+          description: Quota Available.
+          example: 1275
+        quotaUsed:
+          type: number
+          description: Quota used.
+          example: 0
+    Isd:
+      type: object
+      properties:
+        value:
+          type: number
+          description: isd value to be charged
+          example: 45.25
+        percentage:
+          type: number
+          description: isd percentage to be charged
+          example: 4.2
+    Customer:
+      required:
+        - documentNumber
+        - documentType
+      type: object
+      properties:
+        documentNumber:
+          type: string
+          description: Customer identification document number.
+          example: "1716281132"
+        documentType:
+          type: string
+          description: Client identifier type. ID (0001) - Passport (0002) - RUC (0003).
+          example: "0001"
+    Transaction:
+      required:
+        - amount
+        - currency
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Transaction amount
+          example: 1500
+        currency:
+          $ref: '#/components/schemas/Currency'
+    GetExemptionFileResponse:
+      allOf:
+        - $ref: '#/components/schemas/GetExemptionTypeResponse'
+    RemittanceCostType:
+      type: object
+      properties:
+        code:
+          type: string
+          example: SHA
+    ProductType:
+      title: ProductType
+      type: object
+      properties:
+        code:
+          type: string
+          example: "003"
+        description:
+          type: string
+          example: ""
+    ProcessingType:
+      title: ProcessingType
+      type: object
+      properties:
+        code:
+          type: string
+          example: IMMEDIATE
+    GetSourceProduct:
+      title: GetSourceProduct
+      type: object
+      properties:
+        productNumber:
+          type: string
+          example: "12345678"
+        productType:
+          $ref: '#/components/schemas/ProductType'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        alias:
+          type: string
+          example: alias account
+    SourceProduct:
+      title: SourceProduct
+      type: object
+      properties:
+        customerProductId:
+          type: string
+          description: account identification | database.
+          example: 562c0c34-a88a-48b3-85a7-c762c4504022.
+        productId:
+          type: string
+          description: productId.
+          example: 341c0c63-a88a-48b3-85a7-c762c4504022.
+        productNumber:
+          type: string
+          example: "2203114943"
+        productType:
+          $ref: '#/components/schemas/ProductType'
+        currency:
+          $ref: '#/components/schemas/Currency'
+    GetAbroadTransferReasonResponse:
+      $ref: '#/components/schemas/AbroadTransferReasonResponse'
+    AbroadTransferReasonResponse:
+      title: GetAbroadTransferReasonResponse
+      type: object
+      properties:
+        abroadTransferReasonId:
+          type: string
+          description: Id Customer Product.
+          nullable: false
+          example: "2"
+        description:
+          type: string
+          description: Description Customer Product.
+          nullable: false
+          example: IMPORTS
+    GetExemptionTypeResponse:
+      type: object
+      properties:
+        url:
+          maxLength: 255
+          pattern: "^[A-Za-z0-9]+$"
+          type: string
+          example: http://providercom/container/file.jpg?signed=1asxxa123
+        fileName:
+          maxLength: 255
+          pattern: "^[A-Za-z0-9]+$"
+          type: string
+          example: file.jpg
+    PostExemptionTypeRequest:
+      required:
+        - expirationTime
+        - filename
+        - method
+        - provider
+      type: object
+      properties:
+        method:
+          type: string
+          description: Method to use.
+          example: upload
+          enum:
+            - upload
+            - download
+        provider:
+          type: string
+          description: Cloud provider to use.
+          example: azure
+          enum:
+            - azure
+        keepOriginalName:
+          type: boolean
+          description: Indicate if filename is renamed with uuid or not (only for upload).
+          example: true
+          default: true
+        filename:
+          maxLength: 255
+          pattern: "^[a-zA-Z0-9](?:[a-zA-Z0-9\\/\\._-]*[a-zA-Z0-9])?\\.[a-zA-Z0-9_-]*$"
+          type: string
+          description: filename to upload or download
+          example: photo.jpg
+        expirationTime:
+          type: integer
+          description: Time in seconds to expired the signed url
+          example: 3600
+          default: 60
+      additionalProperties: false
+    GetRemittanceTaxResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/RemittanceTaxResponse'
+    RemittanceTaxResponse:
+      type: object
+      properties:
+        remittanceTaxId:
+          type: string
+          description: Tax ID.
+          example: "50"
+        category:
+          $ref: '#/components/schemas/RemittanceTaxResponse_category'
+        description:
+          type: string
+          description: Description of the tax.
+          example: 309 Capital credits abroad activities CP
+        isDisplayRequired:
+          type: string
+          description: Indicate if it is required or not.
+          example: S
+        appendant:
+          $ref: '#/components/schemas/RemittanceTaxResponse_appendant'
+        details:
+          type: array
+          items:
+            type: string
+            example: Proceedings
+    AdditionalData:
+      title: AdditionalData
+      type: object
+      properties:
+        customer:
+          $ref: '#/components/schemas/CustomerAbroadTransferOrder'
+    BsGetOrderHistoryResponse:
+      type: object
+      properties:
+        startOrderDate:
+          type: string
+          description: Initial Date for collect money
+          example: 2022-06-05
+        endOrderDate:
+          type: string
+          description: End Date for collect money
+          example: 2022-06-05
+        lastChangeDate:
+          type: string
+          description: Last Date when the order changes
+          example: 28/01
+        status:
+          $ref: '#/components/schemas/Status'
+        orderHistoryChanges:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderHistory'
+    OrderHistory:
+      type: object
+      properties:
+        changeDate:
+          type: string
+          description: Date when the status change was made
+          example: 2022-06-05T20:10:05
+        customerUser:
+          $ref: '#/components/schemas/User'
+        status:
+          $ref: '#/components/schemas/Status'
+        message:
+          type: string
+          description: action message
+          example: This change is due to ...
+        action:
+          type: string
+          description: Action performed
+          example: TO_APPROVAL
+        nextStatus:
+          $ref: '#/components/schemas/Status'
+    User:
+      type: object
+      properties:
+        documentNumber:
+          type: string
+          description: Customer identification document number.
+          example: "1721553616"
+        documentType:
+          type: string
+          description: Client identifier type. ID (0001) - Passport (0002) - RUC (0003).
+          example: "0001"
+        names:
+          title: Names of user.
+          type: string
+          example: Jhon Carlos
+        surnames:
+          title: Last names of user.
+          type: string
+          example: Steward Colling
+        email:
+          title: Email
+          type: string
+          example: jhondoe@mail.com
+        position:
+          type: string
+          description: Employment relationship
+          example: Manager
+    GetAbroadTransferOrderByFilterResponse:
+      title: GetAbroadTransferOrderByFilterResponse
+      type: object
+      properties:
+        abroadTransferOrder:
+          $ref: '#/components/schemas/GetAbroadTransferOrderResponse'
+        additionalData:
+          $ref: '#/components/schemas/AdditionalData'
+        orderHistory:
+          $ref: '#/components/schemas/BsGetOrderHistoryResponse'
+    PostAbroadTransferOrderRequest:
+      $ref: '#/components/schemas/AbroadTransferOrderPost'
+    PostAbroadTransferOrderResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/AbroadTransferOrderResponse'
+    PatchAbroadTransferOrderRequest:
+      $ref: '#/components/schemas/AbroadTransferOrderPatch'
+    PatchAbroadTransferOrderResponse:
+      $ref: '#/components/schemas/AbroadTransferOrderResponse'
+    GetRecipientFinancialEntityResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecipientFinancialEntityResponse'
+    GetBankingProductParametersByFilterResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/ParametersByFilterResponse'
+    AbroadTransferOrderResponse:
+      title: AbroadTransferOrder
+      type: object
+      properties:
+        abroadTransferOrderId:
+          type: string
+          description: Order identification
+          example: "12345678"
+          x-mapping: abroad_transfer_order.abroad_transfer_order_uuid
+    AbroadTransferOrderPost:
+      title: AbroadTransferOrder
+      type: object
+      properties:
+        orderType:
+          type: string
+          example: ABROAD
+        customerProductId:
+          type: string
+          example: 1073D363-E6D9-4701-AA19-00E1B3DB5613
+        sourceProduct:
+          $ref: '#/components/schemas/SourceProduct'
+        processingType:
+          $ref: '#/components/schemas/ProcessingType'
+        registerDate:
+          type: string
+          example: 2022-11-18T23:50
+        executionDate:
+          type: string
+          example: 2022-11-18T23:50
+        expirationDate:
+          type: string
+          example: 2022-11-18T23:50
+        trayOrderId:
+          type: string
+          example: "14303"
+        amount:
+          type: number
+          example: 123.8
+        status:
+          $ref: '#/components/schemas/Status'
+        abroadTransferOrderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/AbroadTransferOrderItemPost'
+    AbroadTransferOrderPatch:
+      title: AbroadTransferOrder
+      type: object
+      properties:
+        orderType:
+          type: string
+          example: ABROAD
+        fxReferenceId:
+          type: string
+          description: fx orchestrator reference id
+          example: 2074D365-E6D9-4801-AA19-00E1B3DB5614
+        entityTag:
+          type: string
+          example: 2074D365-E6D9-4801-AA19-00E1B3DB5613
+        customerProductId:
+          type: string
+          example: 1073D363-E6D9-4701-AA19-00E1B3DB5613
+        sourceProduct:
+          $ref: '#/components/schemas/SourceProduct'
+        processingType:
+          $ref: '#/components/schemas/ProcessingType'
+        registerDate:
+          type: string
+          example: 2022-11-18T23:50
+        executionDate:
+          type: string
+          example: 2022-11-18T23:50
+        expirationDate:
+          type: string
+          example: 2022-11-18T23:50
+        trayOrderId:
+          type: string
+          example: "14303"
+        amount:
+          type: number
+          example: 123.8
+        status:
+          $ref: '#/components/schemas/Status'
+        abroadTransferOrderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/AbroadTransferOrderItemPatch'
+    AbroadTransferOrderItemPost:
+      type: object
+      properties:
+        orderType:
+          type: string
+          example: ABROAD0
+        currencyExchangeRequired:
+          type: boolean
+          example: true
+        currencyExchange:
+          $ref: '#/components/schemas/CurrencyExchange'
+        beneficiary:
+          $ref: '#/components/schemas/BeneficiaryPost'
+        intermediaryFinancialEntity:
+          $ref: '#/components/schemas/IntermediaryFinancialEntity'
+        destinationProduct:
+          $ref: '#/components/schemas/DestinationProduct'
+        amount:
+          type: number
+          example: 123.8
+        currency:
+          $ref: '#/components/schemas/CurrencyDestiny'
+        beneficiaryTaxId:
+          type: string
+          description: Beneficiary Tax Id
+          example: "1223"
+        remittanceCostType:
+          $ref: '#/components/schemas/RemittanceCostType'
+        economicMotivation:
+          type: string
+          example: economic Motivation
+        importCustomsDeclaration:
+          type: string
+          example: "464654"
+        routingCode:
+          type: string
+          example: routingCode
+        clabe:
+          type: string
+          example: clabe
+        paymentPurpose:
+          type: string
+          example: Scholarship Payment
+        description:
+          type: string
+          example: descripción de la transacción
+        exemption:
+          $ref: '#/components/schemas/Exemption'
+        isd:
+          $ref: '#/components/schemas/Isd'
+        fee:
+          $ref: '#/components/schemas/Fee'
+    AbroadTransferOrderItemPatch:
+      type: object
+      properties:
+        abroadTransferOrderItemId:
+          type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+        entityTag:
+          type: string
+          example: 2074D365-E6D9-4801-AA19-00E1B3DB5613
+        orderType:
+          type: string
+          example: ABROAD0
+        currencyExchangeRequired:
+          type: boolean
+          example: true
+        currencyExchange:
+          $ref: '#/components/schemas/CurrencyExchange'
+        beneficiary:
+          $ref: '#/components/schemas/BeneficiaryPost'
+        intermediaryFinancialEntity:
+          $ref: '#/components/schemas/IntermediaryFinancialEntity'
+        destinationProduct:
+          $ref: '#/components/schemas/DestinationProduct'
+        amount:
+          type: number
+          example: 123.8
+        currency:
+          $ref: '#/components/schemas/CurrencyDestiny'
+        beneficiaryTaxId:
+          type: string
+          description: Beneficiary Tax Id
+          example: "1223"
+        remittanceCostType:
+          $ref: '#/components/schemas/RemittanceCostType'
+        economicMotivation:
+          type: string
+          example: economic Motivation
+        importCustomsDeclaration:
+          type: string
+          example: "464654"
+        routingCode:
+          type: string
+          example: routingCode
+        clabe:
+          type: string
+          example: clabe
+        paymentPurpose:
+          type: string
+          example: Scholarship Payment
+        description:
+          type: string
+          example: descripción de la transacción
+        exemption:
+          $ref: '#/components/schemas/Exemption'
+        isd:
+          $ref: '#/components/schemas/Isd'
+        fee:
+          $ref: '#/components/schemas/Fee'
+    AbroadTransferOrderItemGet:
+      type: object
+      properties:
+        abroadTransferOrderItemId:
+          type: string
+          example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+        entityTag:
+          type: string
+          example: 2074D365-E6D9-4801-AA19-00E1B3DB5613
+        orderType:
+          type: string
+          example: ABROAD0
+        currencyExchangeRequired:
+          type: boolean
+          example: true
+        currencyExchange:
+          $ref: '#/components/schemas/CurrencyExchange'
+        beneficiary:
+          $ref: '#/components/schemas/BeneficiaryGet'
+        intermediaryFinancialEntity:
+          $ref: '#/components/schemas/IntermediaryFinancialEntity'
+        destinationProduct:
+          $ref: '#/components/schemas/DestinationProduct'
+        amount:
+          type: number
+          example: 123.8
+        currency:
+          $ref: '#/components/schemas/CurrencyDestiny'
+        beneficiaryTaxId:
+          type: string
+          description: Beneficiary Tax Id
+          example: "1223"
+        remittanceCostType:
+          $ref: '#/components/schemas/RemittanceCostType'
+        economicMotivation:
+          type: string
+          example: economic Motivation
+        importCustomsDeclaration:
+          type: string
+          example: "464654"
+        routingCode:
+          type: string
+          example: routingCode
+        clabe:
+          type: string
+          example: clabe
+        paymentPurpose:
+          type: string
+          example: Scholarship Payment
+        description:
+          type: string
+          example: descripción de la transacción
+        exemption:
+          $ref: '#/components/schemas/Exemption'
+        isd:
+          $ref: '#/components/schemas/Isd'
+        fee:
+          $ref: '#/components/schemas/Fee'
+    Currency:
+      type: object
+      properties:
+        code:
+          type: string
+          description: currency code | ISO-4217
+          example: USD
+        description:
+          type: string
+          description: currency description | ISO-4217
+          example: Dolares Americanos
+    CurrencyDestiny:
+      type: object
+      properties:
+        code:
+          type: string
+          description: currency code | ISO-4217
+          example: EUR
+        description:
+          type: string
+          description: currency description | ISO-4217
+          example: Euro
+    RecipientFinancialEntityResponse:
+      title: GetRecipientFinancialEntity
+      required:
+        - address
+        - fullName
+        - swiftCode
+      type: object
+      properties:
+        swiftCode:
+          type: string
+          description: Swift code
+          example: FINAPEPLXXX
+          x-mapping: codigoBanco
+        fullName:
+          type: string
+          description: lenguaje seleccionado
+          example: Example Bank Peru
+          x-mapping: discripcion
+        address:
+          $ref: '#/components/schemas/AddressRecipientFinancialEntity'
+    AddressRecipientFinancialEntity:
+      title: address
+      type: object
+      properties:
+        country:
+          $ref: '#/components/schemas/AddressRecipientFinancialEntity_country'
+        city:
+          $ref: '#/components/schemas/City'
+        summary:
+          type: string
+          description: address summary
+          example: AVENIDA RICARDO PALMA 278
+          x-mapping: ciudad
+    City:
+      title: city
+      type: string
+      description: description city
+      example: Lima
+      x-mapping: ciudad
+    GetCountryResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CountryResponse'
+    CountryResponse:
+      title: GetCountryResponse
+      required:
+        - countryId
+        - name
+      type: object
+      properties:
+        countryId:
+          type: string
+          description: Id the country.
+          nullable: false
+          example: AD
+        name:
+          type: string
+          description: Name the country.
+          nullable: false
+          example: ANDORRA
+    CustomerAbroadTransferOrder:
+      title: Customer
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: fullname
+        userName:
+          type: string
+          example: userName
+    GetAbroadTransferOrderResponse:
+      title: GetAbroadTransferOrderResponse
+      type: object
+      properties:
+        abroadTransferOrderId:
+          type: string
+          example: 1073D363-E6D9-4701-AA19-00E1B3DB5613
+        orderType:
+          type: string
+          example: ABROAD
+        fxReferenceId:
+          type: string
+          description: fx orchestrator reference id
+          example: 2074D365-E6D9-4801-AA19-00E1B3DB5614
+        entityTag:
+          type: string
+          example: 2074D365-E6D9-4801-AA19-00E1B3DB5613
+        customerProductId:
+          type: string
+          example: 1073D363-E6D9-4701-AA19-00E1B3DB5613
+        customerAffiliationId:
+          type: string
+          example: 1073D363-E6D9-4701-AA19-00E1B3DB5613
+        sourceProduct:
+          $ref: '#/components/schemas/GetSourceProduct'
+        processingType:
+          $ref: '#/components/schemas/ProcessingType'
+        registerDate:
+          type: string
+          example: 2022-11-18T23:50
+        executionDate:
+          type: string
+          example: 2022-11-18T23:50
+        expirationDate:
+          type: string
+          example: 2022-11-18T23:50
+        customerUserId:
+          type: string
+          example: 26483ece-f70a-4195-9248-6415bf6900ae
+        trayOrderId:
+          type: string
+          example: "14303"
+        amount:
+          type: number
+          example: 123.8
+        status:
+          $ref: '#/components/schemas/Status'
+        channel:
+          type: string
+          example: BUSINESS BANKING
+        abroadTransferOrderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetItemsAbroadTransferOrderResponse'
+    ParametersByFilterResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name Product Operation.
+          example: KIND_EXPENSIVE
+          x-mapping: product_parameter.code_parameter
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValueParametersResponse'
+    ValueParametersResponse:
+      type: object
+      properties:
+        productParameterId:
+          type: string
+          description: Id Product Operation.
+          example: 5619f81e-55c3-4e46-8aec-3d514207371e
+          x-mapping: product_parameter.product_parameter_uuid
+        name:
+          type: string
+          description: Value Product Parameter
+          example: SHA
+          x-mapping: product_parameter.value
+        description:
+          type: string
+          description: Description Product Parameter
+          example: Compartidos con el beneficiario
+          x-mapping: product_parameter.description
+        registerDate:
+          type: string
+          description: Creation date Product Parameter.
+          example: 2022-04-03 00:00:00.000
+          x-mapping: product_parameter.creationDate
+    GetItemsAbroadTransferOrderResponse:
+      $ref: '#/components/schemas/AbroadTransferOrderItemGet'
+    PostAbroadTransferOrderDownloadRequest:
+      title: PostAbroadTransferOrderDownloadRequest
+      type: object
+      properties:
+        trayOrderId:
+          type: number
+          description: Tray order id.
+          example: 5013
+    PostAbroadTransferOrderDownloadResponse:
+      title: PostAbroadTransferOrderDownloadResponse
+      type: string
+      format: byte
+      example: MDE5MTkxMGpzaWppMHM9PQ==
+    BeneficiaryGet:
+      type: object
+      properties:
+        fullName:
+          type: string
+          description: beneficiary fullName.
+          example: Jesus Alberto
+          x-mapping: items_abroad_transfer_order.fullname
+        documentType:
+          type: string
+          description: Beneficiary Document type.
+          example: RUC
+          x-mapping: items_abroad_transfer_order.document_type
+        documentNumber:
+          type: string
+          description: Beneficiary ocument number.
+          example: "1231233450"
+          x-mapping: items_abroad_transfer_order.document_number
+        address:
+          $ref: '#/components/schemas/Address'
+    CurrencyExchange:
+      type: object
+      properties:
+        sourceCode:
+          type: string
+          description: Origin Id
+          example: "46546"
+        operationNumber:
+          type: string
+          description: Operation number
+          example: "46547"
+        details:
+          type: string
+          example: S/D
+        operationType:
+          type: string
+          description: Value is SPOT or FORWARD
+          example: SPOT
+        currencyPair:
+          type: string
+          example: USD.EUR
+        exchangeRate:
+          type: string
+          example: "1.073530000"
+    BeneficiaryPost:
+      type: object
+      properties:
+        documentType:
+          type: string
+          description: Beneficiary Document type.
+          example: RUC
+          x-mapping: items_abroad_transfer_order.document_type
+        documentNumber:
+          type: string
+          description: Beneficiary ocument number.
+          example: "1231233450"
+          x-mapping: items_abroad_transfer_order.document_number
+        fullName:
+          type: string
+          description: beneficiary fullName.
+          example: Jesus Alberto
+          x-mapping: items_abroad_transfer_order.fullname
+        address:
+          $ref: '#/components/schemas/Address'
+    IntermediaryFinancialEntity:
+      type: object
+      properties:
+        intermediaryFinancialEntityIdentificationCode:
+          type: string
+          example: SWIFT or ABA
+        intermediaryFinancialEntityId:
+          type: string
+          description: swift Intermediary Bank
+          example: IRVTUS3N
+          x-mapping: items_abroad_transfer_order.intermediary_abroad_entity_id
+        fullName:
+          type: string
+          description: Name country intermediary financial entity
+          example: España
+          x-mapping: items_abroad_transfer_order.intermediary_bank
+        address:
+          $ref: '#/components/schemas/AddressFinancialEntity'
+    Address:
+      type: object
+      properties:
+        country:
+          $ref: '#/components/schemas/Address_country'
+        city:
+          type: string
+          description: Ciudad de destino
+          example: Barcelona
+          x-mapping: items_abroad_transfer_order.city
+        summary:
+          type: string
+          description: direccion de destino
+          example: OE3 y S78
+          x-mapping: items_abroad_transfer_order.summary_address
+    AddressFinancialEntity:
+      type: object
+      properties:
+        country:
+          $ref: '#/components/schemas/AddressRecipientFinancialEntity_country'
+        city:
+          type: string
+          description: Ciudad de destino
+          example: Barcelona
+          x-mapping: items_abroad_transfer_order.city
+        summary:
+          type: string
+          description: direccion de destino
+          example: OE3 y S78
+          x-mapping: items_abroad_transfer_order.summary_address
+    DestinationProduct:
+      title: Destination Information
+      type: object
+      properties:
+        productNumber:
+          type: string
+          description: account Number
+          example: AC1233546
+          x-mapping: items_abroad_transfer_order.account_number
+        financialEntity:
+          $ref: '#/components/schemas/DestinationProduct_financialEntity'
+    Exemption:
+      title: ExemptionType
+      type: object
+      properties:
+        isEnabled:
+          type: string
+          example: ENABLED
+        type:
+          $ref: '#/components/schemas/ExemptionType'
+        declarationNumberSRI:
+          type: string
+          example: "65959"
+        fileExemption:
+          $ref: '#/components/schemas/FileExemption'
+        amount:
+          type: number
+          example: 0.3
+        quotaAvailable:
+          type: number
+          example: 0.5
+        quotaUsed:
+          type: number
+          example: 0.1
+    FileExemption:
+      type: object
+      properties:
+        fileReferenceId:
+          minLength: 40
+          type: string
+          description: Filenet reference id
+          example: 30865D8B-0000-C51C-A60D-92FED0626730
+        name:
+          type: string
+          example: archivo
+        path:
+          type: string
+          example: C:/documents/archivo.txt
+        status:
+          $ref: '#/components/schemas/ExemptionStatus'
+    ExemptionStatus:
+      type: object
+      properties:
+        code:
+          type: string
+          description: status tipo de excención
+          example: PENDING
+    ExemptionType:
+      type: object
+      properties:
+        code:
+          type: string
+          description: tipo de excención
+          example: Education
+    Status:
+      type: object
+      properties:
+        code:
+          type: string
+          description: ENABLE
+          example: PENDING
+    request-date:
+      type: string
+    Error:
+      required:
+        - developerMessage
+        - errorCode
+        - userMessage
+      type: object
+      properties:
+        errorCode:
+          maxLength: 6
+          pattern: "^[a-zA-Z]+$\\d+$"
+          type: string
+          example: "6"
+        developerMessage:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: Coding Error
+        userMessage:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: Error al validar dispositvo
+        moreInfo:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: ""
+        version:
+          maxLength: 256
+          pattern: "^[a-zA-Z\\s]*$"
+          type: string
+          example: 1.0.0
+        status:
+          maxLength: 15
+          type: number
+          example: 409
+    PostAbroadTransferExcuteRequest_exchangeRateInformation:
+      type: object
+      properties:
+        exchangeRate:
+          type: string
+          example: "1.00000"
+    SupplementaryDataExecute_intermediaryAccount_financialEntity_address_city:
+      type: object
+      properties:
+        description:
+          type: string
+          example: ""
+    SupplementaryDataExecute_intermediaryAccount_financialEntity_address_country:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ""
+        description:
+          type: string
+          example: ""
+    SupplementaryDataExecute_intermediaryAccount_financialEntity_address:
+      type: object
+      properties:
+        fullAddress:
+          type: string
+          example: ""
+        city:
+          $ref: '#/components/schemas/SupplementaryDataExecute_intermediaryAccount_financialEntity_address_city'
+        country:
+          $ref: '#/components/schemas/SupplementaryDataExecute_intermediaryAccount_financialEntity_address_country'
+    SupplementaryDataExecute_intermediaryAccount_financialEntity:
+      type: object
+      properties:
+        bic:
+          type: string
+          example: ""
+        name:
+          type: string
+          example: ""
+        address:
+          $ref: '#/components/schemas/SupplementaryDataExecute_intermediaryAccount_financialEntity_address'
+    SupplementaryDataExecute_intermediaryAccount:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: ""
+        financialEntity:
+          $ref: '#/components/schemas/SupplementaryDataExecute_intermediaryAccount_financialEntity'
+    SupplementaryDataExecute_creditorInstructedAmount_currency:
+      type: object
+      properties:
+        code:
+          type: string
+          example: JPY
+    SupplementaryDataExecute_creditorInstructedAmount:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: "621.55"
+        currency:
+          $ref: '#/components/schemas/SupplementaryDataExecute_creditorInstructedAmount_currency'
+    SupplementaryDataExecute_isd:
+      type: object
+      properties:
+        isExempt:
+          type: string
+          example: S
+        exemptionCode:
+          type: string
+          example: "02"
+        receivedForm:
+          type: string
+          example: "N"
+        exemptionAmount:
+          type: string
+          example: "0"
+        availableQuotaAmount:
+          type: string
+          example: "1158.25"
+        percentage:
+          type: string
+          example: "5.00"
+        code:
+          type: string
+          example: "13"
+        description:
+          type: string
+          example: 'ISD - '
+        amount:
+          type: string
+          example: "25"
+        exemptionForm:
+          type: string
+          example: ""
+    SupplementaryDataExecute_transaction_comissionFee_type:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ""
+    SupplementaryDataExecute_transaction_comissionFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: "25.00"
+        description:
+          type: string
+          example: 'COMISION GIROS EXTERIOR '
+        type:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction_comissionFee_type'
+    SupplementaryDataExecute_transaction_vat:
+      type: object
+      properties:
+        description:
+          type: string
+          example: 'IVA COMISION GIROS EXT '
+    SupplementaryDataExecute_transaction:
+      type: object
+      properties:
+        amountDescription:
+          type: string
+          example: 'MONTO GIROS EXTERIOR '
+        comissionFee:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction_comissionFee'
+        vat:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction_vat'
+    SupplementaryDataExecute_supplementaryReasonData_bceCredit:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ""
+        date:
+          type: string
+          example: ""
+    SupplementaryDataExecute_supplementaryReasonData:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "110"
+        bceCredit:
+          $ref: '#/components/schemas/SupplementaryDataExecute_supplementaryReasonData_bceCredit'
+        dauRecord:
+          type: string
+          example: ANTICIPO
+        reinsuranceContractNumber:
+          type: string
+          example: ""
+    SupplementaryDataExecute_messageChannelDetail_catalog:
+      type: object
+      properties:
+        catalogId:
+          type: string
+          example: codigoAgencia
+        code:
+          type: string
+          example: "0010"
+    SupplementaryDataExecute_messageChannelDetail:
+      type: object
+      properties:
+        catalog:
+          $ref: '#/components/schemas/SupplementaryDataExecute_messageChannelDetail_catalog'
+    SupplementaryDataExecute_swiftMessage_operation:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "1432705"
+    SupplementaryDataExecute_swiftMessage_application_parameter:
+      type: object
+      properties:
+        code:
+          type: string
+          example: BBGIRO
+    SupplementaryDataExecute_swiftMessage_application:
+      type: object
+      properties:
+        code:
+          type: string
+          example: BB
+        parameter:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_application_parameter'
+    SupplementaryDataExecute_swiftMessage_type_subType:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "1"
+    SupplementaryDataExecute_swiftMessage_type:
+      type: object
+      properties:
+        subType:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_type_subType'
+    SupplementaryDataExecute_swiftMessage_reciever:
+      type: object
+      properties:
+        code:
+          type: string
+          example: SCBLUS33XXXX
+    SupplementaryDataExecute_swiftMessage_approvalStatus:
+      type: object
+      properties:
+        code:
+          type: string
+          example: CR
+    SupplementaryDataExecute_swiftMessage_dcStatus:
+      type: object
+      properties:
+        code:
+          type: string
+          example: PEN
+    SupplementaryDataExecute_swiftMessage:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "103"
+        operation:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_operation'
+        generateUserKey:
+          type: string
+          example: "false"
+        userKey:
+          type: string
+          example: BB202301301403191201
+        sessionUser:
+          type: string
+          example: rsalaza3
+        verificationUser:
+          type: string
+          example: empresaXYZ
+        application:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_application'
+        type:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_type'
+        reciever:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_reciever'
+        service:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction_comissionFee_type'
+        approvalStatus:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_approvalStatus'
+        dcStatus:
+          $ref: '#/components/schemas/SupplementaryDataExecute_swiftMessage_dcStatus'
+        isFinancial:
+          type: string
+          example: "true"
+    SupplementaryDataExecute_additionalFields:
+      type: object
+      properties:
+        key:
+          type: string
+          example: clienteExcentoISD
+        value:
+          type: string
+          example: "true"
+    DebtorExecute_account_customer_documentType:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0001"
+    DebtorExecute_account_customer_address_city:
+      type: object
+      properties:
+        description:
+          type: string
+          example: IBARRA
+    DebtorExecute_account_customer_address_country:
+      type: object
+      properties:
+        code:
+          type: string
+          example: EC
+        description:
+          type: string
+          example: ECUADOR
+    DebtorExecute_account_customer_address:
+      type: object
+      properties:
+        fullAddress:
+          type: string
+          example: ALONSO TORRES
+        city:
+          $ref: '#/components/schemas/DebtorExecute_account_customer_address_city'
+        country:
+          $ref: '#/components/schemas/DebtorExecute_account_customer_address_country'
+        zipCode:
+          type: string
+          example: "180204"
+    DebtorExecute_account_customer_segments_structuralSegments:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ""
+        subStructuralSegments:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction_comissionFee_type'
+    DebtorExecute_account_customer_segments:
+      type: object
+      properties:
+        structuralSegments:
+          $ref: '#/components/schemas/DebtorExecute_account_customer_segments_structuralSegments'
+    DebtorExecute_account_customer:
+      type: object
+      properties:
+        documentNumber:
+          type: string
+          example: "0100027432"
+        documentType:
+          $ref: '#/components/schemas/DebtorExecute_account_customer_documentType'
+        fullName:
+          type: string
+          example: GUALPA CUICHAN ELIZA JOSEFINA
+        address:
+          $ref: '#/components/schemas/DebtorExecute_account_customer_address'
+        segments:
+          $ref: '#/components/schemas/DebtorExecute_account_customer_segments'
+    DebtorExecute_account_balanceInformation_availableBalance:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: "18135.19"
+    DebtorExecute_account_balanceInformation:
+      type: object
+      properties:
+        availableBalance:
+          $ref: '#/components/schemas/DebtorExecute_account_balanceInformation_availableBalance'
+    DebtorExecute_account_product_subProduct:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0003"
+    DebtorExecute_account_product:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "001"
+        description:
+          type: string
+          example: AHORRO ELECTRONICO
+        subProduct:
+          $ref: '#/components/schemas/DebtorExecute_account_product_subProduct'
+    DebtorExecute_account:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: "2204044077"
+        customer:
+          $ref: '#/components/schemas/DebtorExecute_account_customer'
+        balanceInformation:
+          $ref: '#/components/schemas/DebtorExecute_account_balanceInformation'
+        product:
+          $ref: '#/components/schemas/DebtorExecute_account_product'
+    CreditorExecute_account_customer_address_city:
+      type: object
+      properties:
+        description:
+          type: string
+          example: HIROSIMA
+    CreditorExecute_account_customer_address_country:
+      type: object
+      properties:
+        code:
+          type: string
+          example: JP
+        description:
+          type: string
+          example: JAPON
+    CreditorExecute_account_customer_address:
+      properties:
+        fullAddress:
+          type: string
+          example: HIROSIMA ABARCAS OE3-174
+        city:
+          $ref: '#/components/schemas/CreditorExecute_account_customer_address_city'
+        country:
+          $ref: '#/components/schemas/CreditorExecute_account_customer_address_country'
+        zipCode:
+          type: string
+          example: ""
+    CreditorExecute_account_customer:
+      type: object
+      properties:
+        documentNumber:
+          type: string
+          example: ""
+        documentType:
+          $ref: '#/components/schemas/SupplementaryDataExecute_transaction_comissionFee_type'
+        fullName:
+          type: string
+          example: jain Joseph
+        address:
+          $ref: '#/components/schemas/CreditorExecute_account_customer_address'
+    CreditorExecute_account_product:
+      type: object
+      properties:
+        code:
+          type: string
+          example: string
+    CreditorExecute_account_financialEntity_address_city:
+      type: object
+      properties:
+        description:
+          type: string
+          example: TOKYO
+    CreditorExecute_account_financialEntity_address_country:
+      type: object
+      properties:
+        code:
+          type: string
+          example: JP
+        description:
+          type: string
+          example: ""
+    CreditorExecute_account_financialEntity_address:
+      type: object
+      properties:
+        fullAddress:
+          type: string
+          example: SANNO PARK TOWER FLOOR 21 11-1 NAGATACHO 2-CHOMECHIYODAKU
+        city:
+          $ref: '#/components/schemas/CreditorExecute_account_financialEntity_address_city'
+        country:
+          $ref: '#/components/schemas/CreditorExecute_account_financialEntity_address_country'
+    CreditorExecute_account_financialEntity:
+      type: object
+      properties:
+        bic:
+          type: string
+          example: SCBLJPJTXXX
+        name:
+          type: string
+          example: STANDARD CHARTERED BANK
+        address:
+          $ref: '#/components/schemas/CreditorExecute_account_financialEntity_address'
+    CreditorExecute_account:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: "123456789"
+        abaNumber:
+          type: string
+          example: ""
+        customer:
+          $ref: '#/components/schemas/CreditorExecute_account_customer'
+        product:
+          $ref: '#/components/schemas/CreditorExecute_account_product'
+        referenceInformation:
+          type: string
+          example: Referencia Aquí
+        financialEntity:
+          $ref: '#/components/schemas/CreditorExecute_account_financialEntity'
+    InstructedAmountExecute_currency:
+      type: object
+      properties:
+        code:
+          type: string
+          example: USD
+    RemittanceTaxResponse_category:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Tax category.
+          example: ISD
+      description: Tax ID.
+    RemittanceTaxResponse_appendant:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ""
+        description:
+          type: string
+          example: ""
+      description: Tax ID.
+    AddressRecipientFinancialEntity_country:
+      type: object
+      properties:
+        code:
+          type: string
+          description: code country
+          example: EC
+        description:
+          type: string
+          description: description country
+          example: Ecuador
+    Address_country:
+      type: object
+      properties:
+        code:
+          type: string
+          description: code country
+          example: EC
+        description:
+          type: string
+          description: description country
+          example: Ecuador
+          x-mapping: items_abroad_transfer_order.country
+    DestinationProduct_financialEntity:
+      type: object
+      properties:
+        financialEntityIdentificationCode:
+          type: string
+          example: SWIFT or ABA
+        financialEntityId:
+          type: string
+          example: "9928"
+          x-mapping: items_abroad_transfer_order.abroad_code
+        fullName:
+          type: string
+          example: Bank of America
+          x-mapping: items_abroad_transfer_order.financial_entity
+        address:
+          $ref: '#/components/schemas/AddressFinancialEntity'
+      description: finalcialEntity
+  responses:
+    BadRequest:
+      description: 400 Bad Request. The request information it's not correct.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 401 Unauthorized.You're not authorized to perform this operation.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: 403 Forbidden. You don't have the right permissions to execute this operation.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 404 Not Found. The server cannot find the requested resource.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: 500 Internal Server Error. An error has occurred.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+    GatewayError:
+      description: 502 Bad Gateway. The service unable to get a valid response.
+      content:
+        application/json;charset=UTF-8:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    trayOrderId:
+      name: trayOrderId
+      in: query
+      description: tray Order Id
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: "12345"
+    fileTransferMethod:
+      name: fileTransferMethod
+      in: query
+      description: file Transfer Method
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: "upload, download"
+    productName:
+      name: productName
+      in: query
+      description: Product operation name
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: ABROAD
+    name:
+      name: name
+      in: query
+      description: Product parameter code
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: KIND_EXPENSIVE
+    swiftCode:
+      name: swiftCode
+      in: query
+      description: Search by swiftCode.
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: FINAPEPLXXX
+    amount:
+      name: amount
+      in: query
+      description: amount.
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: number
+        example: 0
+    exemption:
+      name: exemption
+      in: query
+      description: exemption isd
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: ISD
+    categoryid:
+      name: categoryID
+      in: query
+      description: Search by categories.
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: ISD
+    session-uuid:
+      name: session-uuid
+      in: header
+      description: session uuid
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: ""
+    app-name:
+      name: app-name
+      in: header
+      description: Application Name
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: businessBanking
+    caller-name:
+      name: caller-name
+      in: header
+      description: Api name who request
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: bs-guided-experience
+    request-id:
+      name: request-id
+      in: header
+      description: Request Identifier
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    request-date:
+      name: request-date
+      in: header
+      description: Request Date | RFC 3339 Format
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 2019-10-12 07:20:50.52Z
+    documentNumber:
+      name: documentNumber
+      in: query
+      description: Customer identification document number.
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: "1716281132"
+    documentType:
+      name: documentType
+      in: query
+      description: Client identifier type. ID (0001) - Passport (0002) - RUC (0003).
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+        example: "0001"
+    customer-affiliation-id:
+      name: customer-affiliation-id
+      in: header
+      description: customer Affilition Id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+      x-mapping: abroad_transfer_order.company_contract_uuid
+    channel:
+      name: channel
+      in: header
+      description: transactional channel
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: business banking
+      x-mapping: abroad-transfer-order.channel
+    customer-user-id:
+      name: customer-user-id
+      in: header
+      description: User executing the operation
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 1345678-eb18-432b-a9ac-0aa5e80ebe9b
+      x-mapping: user_company_contract.user_company_contract_uuid
+    abroadTransferOrderId:
+      name: abroadTransferOrderId
+      in: path
+      description: Abroad Transfer Order Id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+      x-mapping: abroad_transfer_order.abroad_transfer_order_uuid
+    action:
+      name: action
+      in: query
+      description: Action Order
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: "TO_PENDING, TO_MODIFY"
+    abroad-transfer-order-item-id:
+      name: abroad-transfer-order-item-id
+      in: path
+      description: Abroad Transfer Order Item Id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 12345678-eb18-432b-a9ac-0aa5e80ebe9a
+      x-mapping: items_abroad_transfer_order.items_abrtrans_order_uuid
+    guid:
+      name: X-Guid
+      in: header
+      description: Indicates the active session in which the user is transacting.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: b292bed18ac34a26bdc021ace9033b19
+    device:
+      name: X-Device
+      in: header
+      description: Hash or identifier of the device.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 9939aadd00ee32
+    deviceIp:
+      name: X-Device-Ip
+      in: header
+      description: IP address of origin of the request.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 200.10.89.34
+    session:
+      name: X-Session
+      in: header
+      description: Indicates the active session in which the user is transacting.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+    agency:
+      name: X-Agency
+      in: header
+      description: Code of the agency where the user is registered.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        maxLength: 9
+        type: string
+        example: "21"
+    geolocation:
+      name: X-Geolocation
+      in: header
+      description: Describes the geolocation where the transaction originates.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        maxLength: 20
+        type: string
+        example: "-0.120670,-78.483371"
+    process-code:
+      name: process-code
+      in: header
+      description: Identifies the process or functionality
+      required: false
+      schema:
+        type: string
+        example: BJACAR01
+    x-session:
+      name: x-session
+      in: header
+      description: Indicates the active session in which the user is transacting.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+    x-device:
+      name: x-device
+      in: header
+      description: Identifier of the device.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 9939aadd00ee32
+    x-device-ip:
+      name: x-device-ip
+      in: header
+      description: IP address of origin of the request.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 200.10.89.34
+    x-language:
+      name: x-language
+      in: header
+      description: ISO – 639-1  – Language Code - 2 digit code.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        maxLength: 5
+        type: string

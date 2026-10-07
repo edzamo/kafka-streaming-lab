@@ -1,0 +1,964 @@
+---
+openapi: 3.0.0
+info:
+  title: API Support Banking Order History V1
+  description: |
+    Support API for order history. <br>
+    > <b>Dominio de Servicio BIAN</b> `Payment Order`<br>
+  version: 1.0.1
+externalDocs:
+  description: API Documentation
+  url: https://example.com/api-docs
+servers:
+  - url: http://localhost:8080/support/banking/v1
+    description: Development
+tags:
+  - name: Order History
+    description: Order History Controller
+  - name: Unapproved Order
+    description: Unapproved Order Controller
+paths:
+  /order-histories/retrieve:
+    post:
+      tags:
+        - Order History
+      summary: Retrieves Order History
+      description: |
+        ### Details:
+        Retrieves order history by filter.
+
+        There are two options in which an order can be filtered.
+        1. Orders are filtered only in which: the lastStatus attribute of the database matches one of the statuses of the anyCurrentStatus attribute of the request object
+        2. Orders that meet the following conditions are filtered:
+
+            A. The database's lastStatus attribute must match the filterStatus[i].currentStatus element of the request object
+
+            B. The filterStatus[i].actionPerformed attribute of the request object must match the history.action attribute of the database
+
+            C. The filterStatus[i].previousStatus attribute must match the history.status attribute of the database
+
+        | Expected result | Query Parameter |
+        |-------------------- |-----------------|
+        |Retrieves the first 10 registered orders  | - |
+        |Retrieves the orders into a range   | limit, offset |
+      operationId: PostOrderHistoryRetrieve
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: true
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: true
+          schema:
+            $ref: '#/components/schemas/request-date'
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: true
+          schema:
+            type: string
+            example: id of request
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: offset
+          in: query
+          description: index to start returning the elements
+          required: false
+          style: form
+          explode: true
+          schema:
+            minimum: 0
+            type: integer
+          example: 10
+        - name: limit
+          in: query
+          description: Number of orders to return
+          required: false
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+          example: 5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostOrderHistoryRetrieveRequest'
+        required: true
+      responses:
+        "200":
+          description: Orders list.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/PostOrderHistoryRetrieveResponse'
+        "404":
+          description: Username not found or user in company provided not found.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order-histories/unapproved-orders:
+    get:
+      tags:
+        - Unapproved Order
+      summary: Retrieves unapproved orders
+      description: |+
+        ### Details:
+        Retrieves unapproved orders that the user can manage.
+
+        | Expected result | Query Parameter |
+        |-------------------- |-----------------|
+        |Retrieves unapproved orders that the user can see | productId, minAmount, maxAmount, currencyCode, excludeCategory |
+        |Retrieves unapproved orders  | productId, minAmount, maxAmount, currencyCode |
+
+        ### The combination described above are the only possible combinations of parameters, other combinations will return error.
+
+      operationId: GetUnapprovedOrderByFilter
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: true
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: true
+          schema:
+            $ref: '#/components/schemas/request-date'
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: true
+          schema:
+            type: string
+            example: id of request
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: productId
+          in: query
+          description: Product id of the orders
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 1091-108111
+          x-mapping: query_order.productId
+        - name: minAmount
+          in: query
+          description: minimum amount to filter the orders
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            format: double
+          example: 1234
+        - name: maxAmount
+          in: query
+          description: maximum amount to filter the orders
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            format: double
+          example: 1827
+        - name: currencyCode
+          in: query
+          description: currency code to filter
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: USD
+        - name: excludeCategory
+          in: query
+          description: An order requires that several people from different categories approve the order, the category to exclude is the category to which the user who is making the query belongs, since if an order has already been approved by someone from that category, it is not necessary to return it
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: 1081-1818
+      responses:
+        "200":
+          description: Orders list.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUnapprovedOrderByFilterResponse'
+        "404":
+          description: Username not found or user in company provided not found.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order-histories:
+    get:
+      tags:
+        - Order History
+      summary: Returns the order history by orderId
+      description: |+
+        ### Details:
+        Returns the detailed order history.
+
+      operationId: GetOrderHistoryByFilter
+      parameters:
+        - name: app-name
+          in: header
+          description: Application Name - BackOffice | WebBanking | MobileToken
+          required: true
+          schema:
+            type: string
+            example: BackOffice
+        - name: caller-name
+          in: header
+          description: Api name who request
+          required: true
+          schema:
+            type: string
+            example: bs-guided-experience
+        - name: process-code
+          in: header
+          description: Identifies the process or functionality
+          required: false
+          schema:
+            type: string
+            example: BJACAR01
+        - name: request-date
+          in: header
+          description: Request Date | RFC 3339 Format
+          required: true
+          schema:
+            $ref: '#/components/schemas/request-date'
+          example: 2019-04-29 07:20:50.52Z
+        - name: request-id
+          in: header
+          description: Request Identifier
+          required: true
+          schema:
+            type: string
+            example: id of request
+        - name: x-session
+          in: header
+          description: Indicates the active session in which the user is transacting.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+        - name: x-device
+          in: header
+          description: Identifier of the device.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 9939aadd00ee32
+        - name: x-device-ip
+          in: header
+          description: IP address of origin of the request.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: 200.10.89.34
+        - name: x-language
+          in: header
+          description: ISO – 639-1  – Language Code - 2 digit code.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maxLength: 5
+            type: string
+        - name: customer-affiliation-id
+          in: header
+          description: Customer affiliated to business Banking
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: customer-user-id
+          in: header
+          description: User executing the operation
+          required: true
+          schema:
+            type: string
+            example: qwerccf-a60b-45e8-b5e3-215924834e5
+        - name: orderId
+          in: query
+          description: Order Id used to find the order
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: "2672"
+      responses:
+        "200":
+          description: Orders list.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/GetOrderHistoryByFilterRetrieveResponse'
+        "404":
+          description: Username not found or user in company provided not found.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: You're not authorized to perform this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: You don't have the right permissions to execute this operation.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: An error has occurred.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "502":
+          description: The service is not available.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    PostOrderHistoryRetrieveRequest:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderFilter'
+    OrderFilter:
+      type: object
+      properties:
+        customerProductIds:
+          type: array
+          description: List of products ids to filter
+          example:
+            - 28972981ddd
+            - 29872gdsiuyd9282
+          items:
+            type: string
+        anyCurrentStatus:
+          type: array
+          description: List of status that do not have any additional conditions for filtering
+          example:
+            - PENDING
+            - AVAILABLE
+          items:
+            type: string
+          x-mapping: query_order.lastStatus
+        filterStatus:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterOrderStatus'
+    PostOrderHistoryRetrieveResponse:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Order:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          description: id order | trayId
+          format: int64
+          example: 465416517
+          x-mapping: query_order.orderId
+        customerProduct:
+          $ref: '#/components/schemas/CustomerProduct'
+        startOrderDate:
+          type: string
+          description: Initial Date for collect money
+          example: 28-01-2022
+          x-mapping: query_order.startDate
+        endOrderDate:
+          type: string
+          description: End Date for collect money
+          example: 28-01-2022
+          x-mapping: query_order.endDate
+        expirationDate:
+          type: string
+          description: Order expiration date
+          example: 28-01-2022
+        amount:
+          type: number
+          description: amount for collect
+          format: double
+          example: 10
+          x-mapping: query_order.amount
+        currency:
+          $ref: '#/components/schemas/Currency'
+        lastChangeDate:
+          type: string
+          description: last order update
+          example: 28-01-2022
+          x-mapping: query_order.lastDate
+        status:
+          $ref: '#/components/schemas/Status'
+        orderItem:
+          $ref: '#/components/schemas/OrderItem'
+        orderHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderHistory'
+    GetOrderHistoryByFilterRetrieveResponse:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          description: id order | trayId
+          format: int64
+          example: 465416517
+          x-mapping: query_order.orderId
+        customerProduct:
+          $ref: '#/components/schemas/CustomerProduct'
+        customerAffiliationId:
+          type: string
+          description: Id of company who generate the new Order.
+          example: 1235454-74v87as85
+          x-mapping: approval_order/company_contract_uuid
+        startOrderDate:
+          type: string
+          description: Initial Date for collect money
+          example: 28-01-2022
+          x-mapping: query_order.startDate
+        endOrderDate:
+          type: string
+          description: End Date for collect money
+          example: 28-01-2022
+          x-mapping: query_order.endDate
+        expirationDate:
+          type: string
+          description: Order expiration date
+          example: 28-01-2022
+          x-mapping: query_order.expirationDate
+        amount:
+          type: number
+          description: amount for collect
+          format: double
+          example: 10
+          x-mapping: query_order.amount
+        currency:
+          $ref: '#/components/schemas/Currency'
+        lastChangeDate:
+          type: string
+          description: last order update
+          example: 28-01-2022
+          x-mapping: query_order.lastDate
+        status:
+          $ref: '#/components/schemas/Status'
+        orderItem:
+          $ref: '#/components/schemas/OrderItem'
+        orderHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderHistory'
+    Pagination:
+      type: object
+      properties:
+        itemQuantity:
+          type: integer
+          description: total number of available orders
+          example: 40
+    GetUnapprovedOrderByFilterResponse:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          description: id order | trayId
+          format: int64
+          example: 465416517
+          x-mapping: query_order.orderId
+        customerProduct:
+          $ref: '#/components/schemas/CustomerProduct'
+        startOrderDate:
+          type: string
+          description: Initial Date for collect money
+          example: 28-01-2022
+          x-mapping: query_order.startDate
+        endOrderDate:
+          type: string
+          description: End Date for collect money
+          example: 28-01-2022
+          x-mapping: query_order.endDate
+        expirationDate:
+          type: string
+          description: Order expiration date
+          example: 28-01-2022
+          x-mapping: query_order.expirationDate
+        amount:
+          type: number
+          description: amount for collect
+          format: double
+          example: 10
+          x-mapping: query_order.amount
+        currency:
+          $ref: '#/components/schemas/Currency'
+        lastChangeDate:
+          type: string
+          description: last order update
+          example: 28-01-2022
+          x-mapping: query_order.lastDate
+        status:
+          $ref: '#/components/schemas/Status'
+        orderItem:
+          $ref: '#/components/schemas/OrderItem'
+        orderHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderHistory'
+    FilterOrderStatus:
+      type: object
+      properties:
+        currentStatus:
+          type: string
+          description: Current status of the order
+          example: VALIDATING_ISD
+          x-mapping: query_order.history.lastStatus
+        actionPerformed:
+          type: string
+          description: Action that the user should have performed on the order
+          example: TO_VALIDATING_ISD
+          x-mapping: query_order.history.action
+        previousStatus:
+          type: string
+          description: State in which the order was when the action was performed
+          example: AVAILABLE
+          x-mapping: query_order.history.status
+    OrderItem:
+      type: object
+      properties:
+        identificationValue:
+          type: string
+          description: value for get a counterpart
+          example: "17913233"
+          x-mapping: query_order.billId
+        beneficiary:
+          $ref: '#/components/schemas/Beneficiary'
+    Beneficiary:
+      type: object
+      properties:
+        fullName:
+          type: string
+          description: beneficiary name
+          example: Camilo Casas
+        documentType:
+          type: string
+          description: beneficiry document type
+          example: "0001"
+        documentNumber:
+          type: string
+          description: beneficiry document number
+          example: "9289282"
+    OrderHistory:
+      type: object
+      properties:
+        changeDate:
+          type: string
+          description: last order update
+          example: 28-01-2022
+          x-mapping: query_order.history.date
+        action:
+          type: string
+          description: value for get a counterpart
+          example: TO_APPROVE
+          x-mapping: query_order.history.action
+        customerUserId:
+          type: string
+          description: value for get a counterpart
+          example: "17913233"
+          x-mapping: query_order.history.customerUserId
+        message:
+          type: string
+          description: action message
+          example: This change is due to ...
+          x-mapping: query_order.history.message
+        status:
+          $ref: '#/components/schemas/OrderHistoryStatus'
+        nextStatus:
+          $ref: '#/components/schemas/OrderHistoryStatus'
+    Currency:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Code for currency
+          example: USD
+          x-mapping: query_order.currencyCode
+    Status:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Code for status
+          example: PENDING
+          x-mapping: query_order.lastStatus
+    OrderHistoryStatus:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Code for status
+          example: PENDING
+          x-mapping: query_order.history.status
+    CustomerProduct:
+      type: object
+      properties:
+        customerProductId:
+          type: string
+          description: product Id
+          example: asdf-32323
+          x-mapping: query_order.productUuid
+        name:
+          type: string
+          description: product name
+          example: REC
+          x-mapping: query_order.orderType
+    Error:
+      type: object
+      properties:
+        errorCode:
+          maxLength: 6
+          pattern: ^[a-zA-Z]+$\d+$
+          type: string
+        developerMessage:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+        userMessage:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+        moreInfo:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+        version:
+          maxLength: 256
+          pattern: ^[a-zA-Z\s]*$
+          type: string
+          example: 1.0.0
+        status:
+          maxLength: 15
+          type: integer
+          example: 409
+      additionalProperties: false
+    request-date:
+      type: string
+  parameters:
+    orderId:
+      name: orderId
+      in: query
+      description: Order Id used to find the order
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+      example: "2672"
+    app-name:
+      name: app-name
+      in: header
+      description: Application Name - BackOffice | WebBanking | MobileToken
+      required: true
+      schema:
+        type: string
+        example: BackOffice
+    caller-name:
+      name: caller-name
+      in: header
+      description: Api name who request
+      required: true
+      schema:
+        type: string
+        example: bs-guided-experience
+    process-code:
+      name: process-code
+      in: header
+      description: Identifies the process or functionality
+      required: false
+      schema:
+        type: string
+        example: BJACAR01
+    request-date:
+      name: request-date
+      in: header
+      description: Request Date | RFC 3339 Format
+      required: true
+      schema:
+        $ref: '#/components/schemas/request-date'
+      example: 2019-04-29 07:20:50.52Z
+    request-id:
+      name: request-id
+      in: header
+      description: Request Identifier
+      required: true
+      schema:
+        type: string
+        example: id of request
+    x-session:
+      name: x-session
+      in: header
+      description: Indicates the active session in which the user is transacting.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: a9fd8deb-2aad-4d88-a7e3-d153c9e44b66
+    x-device:
+      name: x-device
+      in: header
+      description: Identifier of the device.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 9939aadd00ee32
+    x-device-ip:
+      name: x-device-ip
+      in: header
+      description: IP address of origin of the request.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 200.10.89.34
+    x-language:
+      name: x-language
+      in: header
+      description: ISO – 639-1  – Language Code - 2 digit code.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        maxLength: 5
+        type: string
+    customer-affiliation-id:
+      name: customer-affiliation-id
+      in: header
+      description: Customer affiliated to business Banking
+      required: true
+      schema:
+        type: string
+        example: qwerccf-a60b-45e8-b5e3-215924834e5
+    customer-user-id:
+      name: customer-user-id
+      in: header
+      description: User executing the operation
+      required: true
+      schema:
+        type: string
+        example: qwerccf-a60b-45e8-b5e3-215924834e5
