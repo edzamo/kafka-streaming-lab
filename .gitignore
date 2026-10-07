@@ -1,0 +1,29 @@
+# Artefactos de build (pueden contener copias de la configuración)
+build/
+out/
+target/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle / IDE
+.gradle/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Secretos y configuración local: nunca al repositorio
+.env
+.env.*
+*.pem
+*.p12
+*.jks
+*.key
+application-local.yml
+application-local.properties
+application-local.test
+*-secrets.*
+!*.example
+
+# Trazas de herramientas
+.github/modernize/

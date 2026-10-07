@@ -1,0 +1,47 @@
+server:
+  port: 9080
+
+spring:
+  cloud:
+    function:
+      definition: consume # Definición de las funciones que se utilizarán
+    stream:
+      bindings:
+        payment-out-0:
+          destination: sample-file-payment-event-dev
+          binder: kafka1  # Configuración del binder kafka1 para este binding
+        receive-in-0:
+          destination: sample-file-payment-event-dev
+          binder: kafka1  # Configuración del binder kafka1 para este binding
+        report-out-0:
+          destination: sample-file-report-queue-dev
+          binder: kafka2  # Configuración del binder kafka2 para este binding
+        consume-in-0:
+          destination: sample-file-report-queue-dev
+          binder: kafka2  # Configuración del binder kafka2 para este binding
+
+      # Configuración personalizada de los binders kafka1 y kafka2
+      kafka:
+        binder:
+          brokers: ${EVENTHUB_HOST}:9093
+          configuration:
+            security.protocol: SASL_SSL
+            sasl.mechanism: PLAIN
+            sasl.jaas.config: ${kafka.jaas.config}
+
+      binders:
+        kafka1:
+          type: kafka
+          environment:
+            kafka:
+              jaas:
+                config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://${EVENTHUB_HOST}/;SharedAccessKeyName=${EVENTHUB_PAYMENT_KEY_NAME};SharedAccessKey=${EVENTHUB_SHARED_ACCESS_KEY};";
+
+        kafka2:
+          type: kafka
+          environment:
+            kafka:
+              jaas:
+                config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://${EVENTHUB_HOST}/;SharedAccessKeyName=${EVENTHUB_REPORT_KEY_NAME};SharedAccessKey=${EVENTHUB_SHARED_ACCESS_KEY};";
+
+
