@@ -1,5 +1,7 @@
 # Ejercicio 2 · Spring Kafka simple (`KafkaTemplate` + `@KafkaListener`)
 
+> **Arquitectura:** mínima, un solo paquete con `config` (productor, consumidor, topics), `MessageController` (REST) y `KafkaListeners`. Sin capa de dominio. **Índice:** [volver al monorepo](../../README.md).
+
 Kafka con **Spring Boot y `spring-kafka`**: un endpoint REST que publica mensajes, un listener que los consume y la configuración explícita de productor, consumidor y topic.
 
 | | |

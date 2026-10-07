@@ -1,5 +1,7 @@
 # Ejercicio 1 · Kafka con el cliente Java puro (`kafka-clients`)
 
+> **Arquitectura:** ninguna a propósito. Dos clases con `main` (`Producer`, `Consumer`) para ver el cliente nativo sin framework. **Índice:** [volver al monorepo](../README.md).
+
 El ejercicio más básico: un **productor** y un **consumidor** escritos directamente con la librería `kafka-clients`, sin Spring. Sirve para ver **qué hace Kafka por debajo** antes de que un framework lo esconda.
 
 | | |

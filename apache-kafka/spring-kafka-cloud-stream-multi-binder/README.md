@@ -1,5 +1,7 @@
 # Ejercicio 4 · Spring Cloud Stream con **varios binders** (Azure Event Hubs por protocolo Kafka)
 
+> **Arquitectura:** por capas ligera. `controller` (WebFlux) → `ProduceEvents` → `Bridge` (headers de trazabilidad) y `ConsumeEvents`; el paquete `domain` agrupa el envelope CloudEvents, enums, catálogo y excepciones. **Índice:** [volver al monorepo](../../README.md).
+
 La prueba de concepto más completa: una API REST que recibe un evento de **pago de archivos** (con formato CloudEvents), lo publica con **cabeceras de banca** a un Event Hub, y consume otro canal de **reportes** desde un segundo Event Hub. Lo central es el **multi-binder**: dos conexiones distintas al mismo servicio en una sola aplicación.
 
 | | |

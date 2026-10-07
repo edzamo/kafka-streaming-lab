@@ -1,5 +1,7 @@
 # Ejercicio 3 · Spring Cloud Stream con Kafka (modelo funcional)
 
+> **Arquitectura:** servicios + bridge. `ProduceEvents` y `ConsumeEvents` usan Spring Cloud Stream, y `Bridge` encapsula `StreamBridge`. Sin dominio propio. **Índice:** [volver al monorepo](../../README.md).
+
 Mensajería con **Spring Cloud Stream**: en lugar de usar `KafkaTemplate` y `@KafkaListener`, declaras **funciones** (`Consumer<...>`) y **bindings** en la configuración, y el framework conecta cada función con el broker. Aquí el broker es el **endpoint compatible con Kafka de Azure Event Hubs**.
 
 | | |
