@@ -1,5 +1,7 @@
 # async-abroad-transfer-order
 
+> **Arquitectura:** en capas. Entrada de stream (`ConsumerKafka`) → servicio de orquestación (`AsyncAbroadTransferOrderService`) → clientes OpenAPI de seis APIs, con mappers y manejo de errores propios. Candidato a migrar a hexagonal siguiendo el patrón de [`async-interbank-transfer`](../async-interbank-transfer). **Índice:** [volver al monorepo](../README.md).
+
 Microservicio **consumidor de eventos** que procesa de forma asíncrona las **órdenes de transferencia al exterior** de una banca empresarial: actualiza el estado de la orden, programa tareas para órdenes con fecha futura y, cuando corresponde, **ejecuta la transferencia** (con o sin exención de impuesto).
 
 | | |
